@@ -137,3 +137,71 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | Routing | react-router-dom |
 | Styling | CSS Modules |
 | Interaction | Custom Pointer Events API |
+
+---
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| REQ-001 | Phase 1 | Pending |
+| REQ-002 | Phase 1 | Pending |
+| REQ-003 | Phase 1 | Pending |
+| REQ-004 | Phase 1 | Pending |
+| REQ-005 | Phase 1 | Pending |
+| REQ-006 | Phase 1 | Pending |
+| REQ-007 | Phase 1 | Pending |
+| REQ-008 | Phase 1 | Pending |
+| REQ-009 | Phase 1 | Pending |
+| REQ-010 | Phase 1 | Pending |
+| REQ-011 | Phase 2 | Pending |
+| REQ-012 | Phase 2 | Pending |
+| REQ-013 | Phase 2 | Pending |
+| REQ-014 | Phase 2 | Pending |
+| REQ-015 | Phase 2 | Pending |
+| REQ-016 | Phase 5 | Pending |
+| REQ-017 | Phase 2 | Pending |
+| REQ-018 | Phase 2 | Pending |
+| REQ-019 | Phase 2 | Pending |
+| REQ-020 | Phase 2 | Pending |
+| REQ-021 | Phase 2 | Pending |
+| REQ-022 | Phase 2 | Pending |
+| REQ-023 | Phase 5 | Pending |
+| REQ-024 | Phase 2 | Pending |
+| REQ-025 | Phase 3 | Pending |
+| REQ-026 | Phase 3 | Pending |
+| REQ-027 | Phase 3 | Pending |
+| REQ-028 | Phase 1 | Pending |
+| REQ-029 | Phase 1 | Pending |
+| REQ-030 | Phase 3 | Pending |
+| REQ-031 | Phase 3 | Pending |
+| REQ-032 | Phase 3 | Pending |
+| REQ-033 | Phase 5 | Pending |
+| REQ-034 | Phase 5 | Pending |
+| REQ-035 | Phase 5 | Pending |
+| REQ-036 | Phase 5 | Pending |
+| REQ-037 | Phase 5 | Pending |
+| REQ-038 | Phase 4 | Pending |
+| REQ-039 | Phase 4 | Pending |
+| REQ-040 | Phase 4 | Pending |
+| REQ-041 | Phase 4 | Pending |
+| REQ-042 | Phase 4 | Pending |
+| REQ-043 | Phase 4 | Pending |
+| REQ-044 | Phase 4 | Pending |
+| REQ-045 | Phase 4 | Pending |
+| REQ-046 | Phase 4 | Pending |
+| REQ-047 | Phase 4 | Pending |
+| REQ-048 | Phase 3 | Pending |
+| REQ-049 | Phase 3 | Pending |
+| REQ-050 | Phase 3 | Pending |
+| REQ-051 | Phase 3 | Pending |
+| REQ-052 | Phase 3 | Pending |
+| REQ-053 | Phase 3 | Pending |
+| NFR-001 | Phase 2 | Pending |
+| NFR-002 | Phase 5 | Pending |
+| NFR-003 | Phase 5 | Pending |
+| NFR-004 | Phase 1 | Pending |
+| NFR-005 | Phase 5 | Pending |
+| NFR-006 | Phase 4 | Pending |
+| NFR-007 | Phase 5 | Pending |
+| NFR-008 | Phase 2 | Pending |
