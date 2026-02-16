@@ -1,0 +1,12 @@
+{
+  "mode": "yolo",
+  "depth": "deep",
+  "parallelization": true,
+  "git_tracking": true,
+  "agents": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true
+  },
+  "model_profile": "balanced"
+}
