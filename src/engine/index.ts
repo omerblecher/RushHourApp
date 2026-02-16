@@ -9,3 +9,5 @@ export type {
   Difficulty,
   PuzzleDefinition,
 } from './types.js';
+
+export { parseGridString, buildOccupancyGrid, vehicleCells } from './board.js';

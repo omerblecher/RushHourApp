@@ -2,7 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { parseGridString, buildOccupancyGrid, vehicleCells } from '../board.js';
 import type { Vehicle } from '../types.js';
 
-const KNOWN_PUZZLE = 'AA.O..B..OXXB..O..CPPP.CDDEEL.FFG.L';
+// 6x6 grid layout:
+// Row 0: A A B O . .
+// Row 1: . . B O . L
+// Row 2: . X X O . L
+// Row 3: C P P P . .
+// Row 4: C D D . G G
+// Row 5: . F F E E .
+const KNOWN_PUZZLE = 'AABO....BO.L.XXO.LCPPP..CDD.GG.FFEE.';
 
 describe('parseGridString', () => {
   it('returns correct vehicle IDs from known puzzle', () => {
@@ -80,23 +87,25 @@ describe('buildOccupancyGrid', () => {
   it('maps empty cells as null', () => {
     const vehicles = parseGridString(KNOWN_PUZZLE);
     const grid = buildOccupancyGrid(vehicles);
-    // Cell [0][2] is '.' in the grid string
-    expect(grid[0][2]).toBeNull();
+    // Cell [0][4] is '.' in the grid string
+    expect(grid[0][4]).toBeNull();
   });
 
   it('maps all vehicles correctly for known puzzle', () => {
     const vehicles = parseGridString(KNOWN_PUZZLE);
     const grid = buildOccupancyGrid(vehicles);
-    // Row 0: A A . O . .
+    // Row 0: A A B O . .
     expect(grid[0][0]).toBe('A');
     expect(grid[0][1]).toBe('A');
+    expect(grid[0][2]).toBe('B');
     expect(grid[0][3]).toBe('O');
-    // Row 4: D D E E L .
-    expect(grid[4][0]).toBe('D');
+    // Row 4: C D D . G G
+    expect(grid[4][0]).toBe('C');
     expect(grid[4][1]).toBe('D');
-    expect(grid[4][2]).toBe('E');
-    expect(grid[4][3]).toBe('E');
-    expect(grid[4][4]).toBe('L');
+    expect(grid[4][2]).toBe('D');
+    expect(grid[4][3]).toBeNull();
+    expect(grid[4][4]).toBe('G');
+    expect(grid[4][5]).toBe('G');
   });
 });
 
