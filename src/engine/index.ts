@@ -13,3 +13,5 @@ export type {
 export { parseGridString, buildOccupancyGrid, vehicleCells } from './board.js';
 
 export { GameEngine } from './engine.js';
+
+export { solvePuzzle } from './solver.js';
