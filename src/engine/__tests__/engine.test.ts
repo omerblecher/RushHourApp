@@ -195,4 +195,123 @@ describe('GameEngine', () => {
       expect(startTime2).toBe(startTime1);
     });
   });
+
+  describe('undo', () => {
+    it('returns MoveResult', () => {
+      const engine = new GameEngine('..AA................................');
+      engine.move('A', 0, 0);
+      const result = engine.undo();
+
+      expect(result).toHaveProperty('success');
+      expect(result).toHaveProperty('state');
+    });
+
+    it('restores vehicle to previous position after one move', () => {
+      const engine = new GameEngine('..AA................................');
+      engine.move('A', 0, 0);
+      const result = engine.undo();
+
+      expect(result.success).toBe(true);
+      expect(result.state.vehicles[0].position).toEqual({ row: 0, col: 2 });
+    });
+
+    it('undo increments moveCount (does NOT decrement)', () => {
+      const engine = new GameEngine('..AA................................');
+      engine.move('A', 0, 0); // moveCount = 1
+      engine.undo(); // moveCount = 2 (increments!)
+
+      expect(engine.getState().moveCount).toBe(2);
+    });
+
+    it('undo on fresh game returns failure', () => {
+      const engine = new GameEngine('..AA................................');
+      const result = engine.undo();
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toBeDefined();
+      expect(result.reason!.toLowerCase()).toMatch(/no moves/);
+    });
+
+    it('multiple undos: can undo entire move history one step at a time', () => {
+      const engine = new GameEngine('..AA................................');
+      engine.move('A', 0, 0); // A at col 0
+      engine.move('A', 0, 4); // A at col 4
+
+      engine.undo(); // A back to col 0
+      expect(engine.getState().vehicles[0].position.col).toBe(0);
+
+      engine.undo(); // A back to col 2
+      expect(engine.getState().vehicles[0].position.col).toBe(2);
+    });
+
+    it('each undo increments moveCount', () => {
+      const engine = new GameEngine('..AA................................');
+      engine.move('A', 0, 0); // moveCount = 1
+      engine.move('A', 0, 4); // moveCount = 2
+      engine.undo(); // moveCount = 3
+      engine.undo(); // moveCount = 4
+
+      expect(engine.getState().moveCount).toBe(4);
+    });
+
+    it('after win + undo: isWon becomes false, endTime resets to null', () => {
+      const engine = new GameEngine('............XX......................');
+      engine.move('X', 2, 4); // win
+      expect(engine.getState().isWon).toBe(true);
+
+      engine.undo();
+      expect(engine.getState().isWon).toBe(false);
+      expect(engine.getState().endTime).toBeNull();
+    });
+
+    it('undo does NOT affect startTime', () => {
+      const engine = new GameEngine('..AA................................');
+      engine.move('A', 0, 0);
+      const startTime = engine.getState().startTime;
+      engine.undo();
+
+      expect(engine.getState().startTime).toBe(startTime);
+    });
+  });
+
+  describe('reset', () => {
+    it('returns GameState', () => {
+      const engine = new GameEngine('..AA................................');
+      const state = engine.reset();
+
+      expect(state).toHaveProperty('vehicles');
+      expect(state).toHaveProperty('moveCount');
+    });
+
+    it('restores all vehicles to initial positions after moves', () => {
+      const engine = new GameEngine('..AA................................');
+      engine.move('A', 0, 0);
+      const state = engine.reset();
+
+      expect(state.vehicles[0].position).toEqual({ row: 0, col: 2 });
+    });
+
+    it('sets moveCount to 0, clears moveHistory, nulls times, clears isWon', () => {
+      const engine = new GameEngine('............XX......................');
+      engine.move('X', 2, 4); // win state
+
+      const state = engine.reset();
+      expect(state.moveCount).toBe(0);
+      expect(state.moveHistory).toEqual([]);
+      expect(state.startTime).toBeNull();
+      expect(state.endTime).toBeNull();
+      expect(state.isWon).toBe(false);
+    });
+
+    it('after reset, first move sets startTime again', () => {
+      const engine = new GameEngine('..AA................................');
+      engine.move('A', 0, 0);
+      engine.reset();
+
+      expect(engine.getState().startTime).toBeNull();
+
+      engine.move('A', 0, 0);
+      expect(engine.getState().startTime).not.toBeNull();
+    });
+  });
 });
