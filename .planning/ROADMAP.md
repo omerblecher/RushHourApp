@@ -30,11 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Win condition fires when the red target car (horizontal, row 3) reaches the right edge exit
   4. Move counter increments on each valid move and timer tracking starts/stops correctly in the engine state
   5. BFS solver can take any puzzle configuration and return the optimal move count, or report unsolvable
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Types, grid parser, and board model (TDD)
+- [ ] 01-02-PLAN.md -- GameEngine class: moves, collision, win, undo, reset (TDD)
+- [ ] 01-03-PLAN.md -- BFS solver and barrel export with integration test (TDD)
 
 ### Phase 2: Board UI and Drag Interaction
 **Goal**: Users can see and interact with the puzzle board -- dragging vehicles with mouse or touch on a responsive, visually polished game board
@@ -175,7 +176,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Game Engine | 0/? | Not started | - |
+| 1. Game Engine | 0/3 | Planning complete | - |
 | 2. Board UI and Drag Interaction | 0/? | Not started | - |
 | 3. Puzzle Data and Navigation | 0/? | Not started | - |
 | 4. Firebase Integration | 0/? | Not started | - |
