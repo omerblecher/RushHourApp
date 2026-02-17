@@ -1,0 +1,71 @@
+/* Button row below the board */
+.controlBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: min(90vw, 90vh, 480px);
+  gap: 12px;
+}
+
+/* Individual control button */
+.button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  /* Large touch target (44px+ for mobile accessibility) */
+  min-width: 80px;
+  min-height: 56px;
+  padding: 8px 16px;
+
+  background: #3e2723;
+  color: #f5f0e8;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: background 0.12s, transform 0.1s, box-shadow 0.1s;
+
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:hover:not(:disabled) {
+  background: #4e342e;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Press effect */
+.button:active:not(:disabled) {
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.7);
+}
+
+@media (max-width: 380px) {
+  .button {
+    min-width: 64px;
+    padding: 8px 10px;
+  }
+}

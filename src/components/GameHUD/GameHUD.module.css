@@ -1,0 +1,63 @@
+/* HUD strip above the board — scoreboard feel */
+.hud {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: min(90vw, 90vh, 480px);
+  background: #3e2723;
+  color: #f5f0e8;
+  border-radius: 10px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  gap: 16px;
+}
+
+/* Each stat block (label + value) */
+.moves,
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.timer {
+  align-items: flex-end;
+}
+
+/* Small uppercase label */
+.label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(245, 240, 232, 0.55);
+}
+
+/* Large primary value */
+.value {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #f5f0e8;
+  line-height: 1;
+}
+
+/* Muted "/ N min" suffix */
+.minMoves {
+  font-size: 0.85rem;
+  color: rgba(245, 240, 232, 0.6);
+  font-weight: 400;
+}
+
+/* Responsive: slightly smaller on narrow viewports */
+@media (max-width: 380px) {
+  .hud {
+    padding: 8px 14px;
+  }
+
+  .value {
+    font-size: 1.1rem;
+  }
+}

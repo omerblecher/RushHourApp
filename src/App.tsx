@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useGameStore } from './store/gameStore';
 import { Board } from './components/Board/Board';
+import { GameHUD } from './components/GameHUD/GameHUD';
+import { ControlBar } from './components/ControlBar/ControlBar';
 import styles from './App.module.css';
 
 // Test puzzle for Phase 2 development (36 chars, X on row 2 = exit row)
@@ -11,18 +13,21 @@ import styles from './App.module.css';
 // Row 4: . D D . . .
 // Row 5: . . . . . .
 const DEV_PUZZLE = '..AA.......BXX...B....CC.DD.........';
+const DEV_MIN_MOVES = 8;
 
 function App() {
   const loadPuzzle = useGameStore((s) => s.loadPuzzle);
 
   useEffect(() => {
-    loadPuzzle(DEV_PUZZLE);
+    loadPuzzle(DEV_PUZZLE, DEV_MIN_MOVES);
   }, [loadPuzzle]);
 
   return (
     <div className={styles.app}>
       <h1 className={styles.title}>Rush Hour</h1>
+      <GameHUD />
       <Board />
+      <ControlBar />
     </div>
   );
 }
