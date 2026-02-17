@@ -1,11 +1,11 @@
 .vehicle {
+  position: absolute;
   border-radius: 10px;
   border: 2px solid transparent;
   cursor: grab;
   user-select: none;
   touch-action: none;
   pointer-events: auto;
-  padding: 4px;
   /* No transition in default state - snap is added dynamically by drag system */
 }
 

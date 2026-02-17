@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { useGameStore } from '../store/gameStore';
 import type { Vehicle } from '../engine/types';
 
@@ -24,7 +24,6 @@ interface DragState {
   minPx: number;
   maxPx: number;
   cellSizePx: number;
-  boardRect: DOMRect;
 }
 
 export function useDrag({
@@ -32,25 +31,29 @@ export function useDrag({
   orientation,
   onMoveCommit,
 }: UseDragOptions): {
-  ref: React.RefObject<HTMLDivElement | null>;
+  ref: React.RefCallback<HTMLDivElement>;
   isDragging: boolean;
 } {
-  const ref = useRef<HTMLDivElement | null>(null);
+  const elRef = useRef<HTMLDivElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragStateRef = useRef<DragState | null>(null);
   const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const getVehicles = useCallback(
-    () => useGameStore.getState().state?.vehicles ?? [],
-    []
-  );
+  // Store latest values in refs so event handlers always see current values
+  const vehicleIdRef = useRef(vehicleId);
+  const orientationRef = useRef(orientation);
+  const onMoveCommitRef = useRef(onMoveCommit);
+  vehicleIdRef.current = vehicleId;
+  orientationRef.current = orientation;
+  onMoveCommitRef.current = onMoveCommit;
 
-  const onPointerDown = useCallback(
-    (e: PointerEvent) => {
-      const el = ref.current;
+  // Stable event handlers that read from refs
+  const handlersRef = useRef({
+    onPointerDown(e: PointerEvent) {
+      const el = elRef.current;
       if (!el) return;
 
-      // Only handle primary pointer (left click / first touch)
+      // Only handle primary pointer
       if (e.button !== 0 && e.pointerType === 'mouse') return;
 
       // Cancel any pending snap animation
@@ -60,31 +63,29 @@ export function useDrag({
         el.style.transition = '';
       }
 
-      // Find the board element via the data-board attribute
+      // Find the board element
       const boardEl = el.closest('[data-board]') as HTMLElement | null;
       if (!boardEl) return;
 
-      // Cache board rect ONCE here — never read in pointermove
+      // Cache board rect ONCE
       const boardRect = boardEl.getBoundingClientRect();
-
-      // Compute cell size in pixels from actual board dimensions
       const boardInnerW = boardRect.width - 2 * BOARD_PADDING;
       const cellSizePx = (boardInnerW - GAP_PX * (GRID_SIZE - 1)) / GRID_SIZE;
 
-      // Get current translate from element (may be non-zero if we're re-grabbing mid-snap)
+      // Get current translate
       const currentTransform = new DOMMatrix(getComputedStyle(el).transform);
       const startTranslateX = currentTransform.m41;
       const startTranslateY = currentTransform.m42;
 
-      // Determine vehicle's current grid position from the data attribute
+      // Vehicle's current grid position
       const startRow = parseInt(el.dataset.row ?? '0', 10);
       const startCol = parseInt(el.dataset.col ?? '0', 10);
 
-      // Pre-compute collision bounds in pixels
-      const vehicles = getVehicles();
+      // Pre-compute collision bounds
+      const vehicles = useGameStore.getState().state?.vehicles ?? [];
       const { minPx, maxPx } = computeCollisionBounds(
-        vehicleId,
-        orientation,
+        vehicleIdRef.current,
+        orientationRef.current,
         startRow,
         startCol,
         vehicles,
@@ -102,13 +103,9 @@ export function useDrag({
         minPx,
         maxPx,
         cellSizePx,
-        boardRect,
       };
 
-      // Capture pointer for reliable out-of-element tracking
       el.setPointerCapture(e.pointerId);
-
-      // Apply drag visual
       el.style.willChange = 'transform';
       el.style.zIndex = '100';
       el.style.transition = '';
@@ -116,70 +113,63 @@ export function useDrag({
       setIsDragging(true);
       e.preventDefault();
     },
-    [vehicleId, orientation, getVehicles]
-  );
 
-  const onPointerMove = useCallback((e: PointerEvent) => {
-    const ds = dragStateRef.current;
-    const el = ref.current;
-    if (!ds || !el || e.pointerId !== ds.pointerId) return;
-
-    if (orientation === 'horizontal') {
-      const rawDelta = e.clientX - ds.startPointerX + ds.startTranslateX;
-      const clamped = Math.min(ds.maxPx, Math.max(ds.minPx, rawDelta));
-      el.style.transform = `translate(${clamped}px, 0px)`;
-    } else {
-      const rawDelta = e.clientY - ds.startPointerY + ds.startTranslateY;
-      const clamped = Math.min(ds.maxPx, Math.max(ds.minPx, rawDelta));
-      el.style.transform = `translate(0px, ${clamped}px)`;
-    }
-  }, [orientation]);
-
-  const onPointerUp = useCallback(
-    (e: PointerEvent) => {
+    onPointerMove(e: PointerEvent) {
       const ds = dragStateRef.current;
-      const el = ref.current;
+      const el = elRef.current;
+      if (!ds || !el || e.pointerId !== ds.pointerId) return;
+
+      if (orientationRef.current === 'horizontal') {
+        const rawDelta = e.clientX - ds.startPointerX + ds.startTranslateX;
+        const clamped = Math.min(ds.maxPx, Math.max(ds.minPx, rawDelta));
+        el.style.transform = `translate(${clamped}px, 0px)`;
+      } else {
+        const rawDelta = e.clientY - ds.startPointerY + ds.startTranslateY;
+        const clamped = Math.min(ds.maxPx, Math.max(ds.minPx, rawDelta));
+        el.style.transform = `translate(0px, ${clamped}px)`;
+      }
+    },
+
+    onPointerUp(e: PointerEvent) {
+      const ds = dragStateRef.current;
+      const el = elRef.current;
       if (!ds || !el || e.pointerId !== ds.pointerId) return;
 
       dragStateRef.current = null;
 
-      // Read current transform delta
       const currentTransform = new DOMMatrix(getComputedStyle(el).transform);
       const currentTranslateX = currentTransform.m41;
       const currentTranslateY = currentTransform.m42;
 
       const { cellSizePx, startRow, startCol } = ds;
+      const cellStep = cellSizePx + GAP_PX;
 
-      // Calculate snapped grid position
       let newRow = startRow;
       let newCol = startCol;
 
-      if (orientation === 'horizontal') {
-        // Delta in pixels from original position
+      if (orientationRef.current === 'horizontal') {
         const delta = currentTranslateX - ds.startTranslateX;
-        const cellsMoved = Math.round(delta / (cellSizePx + GAP_PX));
+        const cellsMoved = Math.round(delta / cellStep);
         newCol = Math.max(0, Math.min(GRID_SIZE - 1, startCol + cellsMoved));
       } else {
         const delta = currentTranslateY - ds.startTranslateY;
-        const cellsMoved = Math.round(delta / (cellSizePx + GAP_PX));
+        const cellsMoved = Math.round(delta / cellStep);
         newRow = Math.max(0, Math.min(GRID_SIZE - 1, startRow + cellsMoved));
       }
 
-      // Apply snap animation
+      // Snap animation
       el.style.transition = `transform ${SNAP_DURATION_MS}ms ease-out`;
 
-      if (orientation === 'horizontal') {
-        // Snap to exactly the correct pixel offset from start
+      if (orientationRef.current === 'horizontal') {
         const targetCells = newCol - startCol;
-        const targetPx = targetCells * (cellSizePx + GAP_PX);
+        const targetPx = targetCells * cellStep;
         el.style.transform = `translate(${targetPx + ds.startTranslateX}px, 0px)`;
       } else {
         const targetCells = newRow - startRow;
-        const targetPx = targetCells * (cellSizePx + GAP_PX);
+        const targetPx = targetCells * cellStep;
         el.style.transform = `translate(0px, ${targetPx + ds.startTranslateY}px)`;
       }
 
-      // After animation: commit move to store (React re-renders vehicle to correct absolute position, reset transform)
       snapTimerRef.current = setTimeout(() => {
         snapTimerRef.current = null;
         el.style.transition = '';
@@ -187,61 +177,47 @@ export function useDrag({
         el.style.willChange = '';
         el.style.zIndex = '';
 
-        // Commit move if position changed
         if (newRow !== startRow || newCol !== startCol) {
-          onMoveCommit(vehicleId, newRow, newCol);
+          onMoveCommitRef.current(vehicleIdRef.current, newRow, newCol);
         }
       }, SNAP_DURATION_MS);
 
       el.releasePointerCapture(e.pointerId);
       setIsDragging(false);
     },
-    [vehicleId, orientation, onMoveCommit]
-  );
-
-  // Attach/detach pointer event listeners via callback ref pattern
-  const setRef = useCallback(
-    (el: HTMLDivElement | null) => {
-      // Remove listeners from old element
-      const old = ref.current;
-      if (old) {
-        old.removeEventListener('pointerdown', onPointerDown);
-        old.removeEventListener('pointermove', onPointerMove);
-        old.removeEventListener('pointerup', onPointerUp);
-        old.removeEventListener('pointercancel', onPointerUp);
-      }
-
-      // Add listeners to new element
-      if (el) {
-        el.addEventListener('pointerdown', onPointerDown);
-        el.addEventListener('pointermove', onPointerMove);
-        el.addEventListener('pointerup', onPointerUp);
-        el.addEventListener('pointercancel', onPointerUp);
-      }
-
-      ref.current = el;
-    },
-    [onPointerDown, onPointerMove, onPointerUp]
-  );
-
-  // Return a proxy ref that installs/removes listeners
-  const proxyRef = useRef<HTMLDivElement | null>(null);
-
-  // Use a stable ref object with a custom setter
-  const stableRef = useRef<{ current: HTMLDivElement | null }>({
-    get current() {
-      return proxyRef.current;
-    },
-    set current(el: HTMLDivElement | null) {
-      if (el !== proxyRef.current) {
-        setRef(el);
-        proxyRef.current = el;
-      }
-    },
   });
 
+  // Callback ref — attaches/detaches listeners when element mounts/unmounts
+  const callbackRef = useCallback((el: HTMLDivElement | null) => {
+    const old = elRef.current;
+    if (old) {
+      old.removeEventListener('pointerdown', handlersRef.current.onPointerDown);
+      old.removeEventListener('pointermove', handlersRef.current.onPointerMove);
+      old.removeEventListener('pointerup', handlersRef.current.onPointerUp);
+      old.removeEventListener('pointercancel', handlersRef.current.onPointerUp);
+    }
+
+    elRef.current = el;
+
+    if (el) {
+      el.addEventListener('pointerdown', handlersRef.current.onPointerDown);
+      el.addEventListener('pointermove', handlersRef.current.onPointerMove);
+      el.addEventListener('pointerup', handlersRef.current.onPointerUp);
+      el.addEventListener('pointercancel', handlersRef.current.onPointerUp);
+    }
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (snapTimerRef.current !== null) {
+        clearTimeout(snapTimerRef.current);
+      }
+    };
+  }, []);
+
   return {
-    ref: stableRef.current as React.RefObject<HTMLDivElement | null>,
+    ref: callbackRef,
     isDragging,
   };
 }
@@ -249,9 +225,6 @@ export function useDrag({
 /**
  * Pre-computes the min and max pixel translate values that the vehicle
  * can move without hitting another vehicle or the board walls.
- *
- * Returns values relative to the vehicle's current position (so 0 means
- * no movement, positive means right/down, negative means left/up).
  */
 function computeCollisionBounds(
   vehicleId: string,
@@ -261,19 +234,17 @@ function computeCollisionBounds(
   vehicles: Vehicle[],
   cellSizePx: number
 ): { minPx: number; maxPx: number } {
-  // Build occupancy grid
   const grid: (string | null)[][] = Array.from({ length: GRID_SIZE }, () =>
     Array(GRID_SIZE).fill(null)
   );
 
   for (const v of vehicles) {
-    const size = v.size;
     if (v.orientation === 'horizontal') {
-      for (let i = 0; i < size; i++) {
+      for (let i = 0; i < v.size; i++) {
         grid[v.position.row][v.position.col + i] = v.id;
       }
     } else {
-      for (let i = 0; i < size; i++) {
+      for (let i = 0; i < v.size; i++) {
         grid[v.position.row + i][v.position.col] = v.id;
       }
     }
@@ -286,7 +257,6 @@ function computeCollisionBounds(
   const cellStep = cellSizePx + GAP_PX;
 
   if (orientation === 'horizontal') {
-    // Scan left from startCol for blocker/wall
     let minCol = 0;
     for (let c = startCol - 1; c >= 0; c--) {
       if (grid[startRow][c] !== null && grid[startRow][c] !== vehicleId) {
@@ -295,7 +265,6 @@ function computeCollisionBounds(
       }
     }
 
-    // Scan right from startCol+size for blocker/wall
     let maxCol = GRID_SIZE - size;
     for (let c = startCol + size; c < GRID_SIZE; c++) {
       if (grid[startRow][c] !== null && grid[startRow][c] !== vehicleId) {
@@ -304,11 +273,11 @@ function computeCollisionBounds(
       }
     }
 
-    const minPx = (minCol - startCol) * cellStep;
-    const maxPx = (maxCol - startCol) * cellStep;
-    return { minPx, maxPx };
+    return {
+      minPx: (minCol - startCol) * cellStep,
+      maxPx: (maxCol - startCol) * cellStep,
+    };
   } else {
-    // Scan up from startRow for blocker/wall
     let minRow = 0;
     for (let r = startRow - 1; r >= 0; r--) {
       if (grid[r][startCol] !== null && grid[r][startCol] !== vehicleId) {
@@ -317,7 +286,6 @@ function computeCollisionBounds(
       }
     }
 
-    // Scan down from startRow+size for blocker/wall
     let maxRow = GRID_SIZE - size;
     for (let r = startRow + size; r < GRID_SIZE; r++) {
       if (grid[r][startCol] !== null && grid[r][startCol] !== vehicleId) {
@@ -326,8 +294,9 @@ function computeCollisionBounds(
       }
     }
 
-    const minPx = (minRow - startRow) * cellStep;
-    const maxPx = (maxRow - startRow) * cellStep;
-    return { minPx, maxPx };
+    return {
+      minPx: (minRow - startRow) * cellStep,
+      maxPx: (maxRow - startRow) * cellStep,
+    };
   }
 }
