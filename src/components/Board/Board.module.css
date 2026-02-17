@@ -1,0 +1,61 @@
+/* Outer responsive wrapper — controls overall board size */
+.boardWrapper {
+  width: min(90vw, 90vh, 480px);
+  aspect-ratio: 1 / 1;
+
+  /* CSS custom properties for vehicle positioning math */
+  --grid-gap: 3px;
+  --grid-padding: 10px;
+  --grid-cols: 6;
+}
+
+/* Board frame — dark wood border like a physical board game */
+.board {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #4a3728;
+  border-radius: 14px;
+  padding: var(--grid-padding);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Exit gap — overlaps the right border at row 3 (row index 2) */
+.exitMarker {
+  position: absolute;
+  right: -4px;
+  top: calc(var(--grid-padding) + (2 / 6) * (100% - 2 * var(--grid-padding)));
+  height: calc((1 / 6) * (100% - 2 * var(--grid-padding)));
+  width: 14px;
+  background: #f5f0e8;
+  z-index: 10;
+  border-radius: 0 3px 3px 0;
+  box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.15);
+}
+
+/* 6x6 CSS grid of cell tiles */
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: var(--grid-gap);
+  width: 100%;
+  height: 100%;
+  background: #3a2a1e;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Vehicle layer — absolutely covers the grid area */
+.vehicleLayer {
+  position: absolute;
+  /* Inset matches the board padding */
+  inset: var(--grid-padding);
+  pointer-events: none;
+  border-radius: 8px;
+  overflow: visible;
+}
