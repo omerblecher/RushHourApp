@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 2 of 5 (Board UI and Drag Interaction)
-Plan: 1 of 3 in current phase
-Status: Plan 02-01 complete, ready for 02-02
-Last activity: 2026-02-17 -- Plan 02-01 executed (Vite/React scaffold + static board render)
+Plan: 2 of 3 in current phase
+Status: Plan 02-02 complete, ready for 02-03
+Last activity: 2026-02-17 -- Plan 02-02 executed (drag interaction system, GameHUD, ControlBar)
 
-Progress: [████░░░░░░] 27%
+Progress: [█████░░░░░] 36%
 
 ## Performance Metrics
 
@@ -28,10 +28,10 @@ Progress: [████░░░░░░] 27%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-game-engine | 3/3 | 13 min | 4 min |
-| 02-board-ui-and-drag-interaction | 1/3 | 6 min | 6 min |
+| 02-board-ui-and-drag-interaction | 2/3 | 8 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5 min), 01-02 (3 min), 01-03 (5 min), 02-01 (6 min)
+- Last 5 plans: 01-01 (5 min), 01-02 (3 min), 01-03 (5 min), 02-01 (6 min), 02-02 (2 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -56,6 +56,10 @@ Recent decisions affecting current work:
 - [02-01]: vehicleLayer uses inset:var(--grid-padding) so 100% reference equals grid area exactly
 - [02-01]: Removed rootDir from tsconfig (TS6059 conflict with vite.config.ts inclusion)
 - [02-01]: Vehicle.size typed as 2|3 not 1 -- size===1 comparison is a TypeScript error
+- [02-02]: data-board attribute on boardWrapper lets useDrag resolve board rect via closest() -- no prop drilling needed
+- [02-02]: data-row/data-col on Vehicle div provide drag start position without store reads in event handler
+- [02-02]: 150ms snap delay before store commit so React re-renders after CSS transition completes (no visual jump)
+- [02-02]: Timer freeze via endTime branch in useEffect dependency array -- clean interval cleanup on win/reset
 
 ### Pending Todos
 
@@ -69,5 +73,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 02-01 (Vite scaffold + static board render)
-Resume file: .planning/phases/02-board-ui-and-drag-interaction/02-02-PLAN.md
+Stopped at: Completed 02-02 (drag interaction system, GameHUD, ControlBar)
+Resume file: .planning/phases/02-board-ui-and-drag-interaction/02-03-PLAN.md
