@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** A fun, polished Rush Hour sliding puzzle game where players drag vehicles on a 6x6 grid to free the red car, competing on global leaderboards
-**Current focus:** Phase 1 - Game Engine
+**Current focus:** Phase 2 - Board UI and Drag Interaction
 
 ## Current Position
 
-Phase: 1 of 5 (Game Engine)
-Plan: 2 of 3 in current phase
-Status: Plan 01-02 complete, ready for 01-03
-Last activity: 2026-02-16 -- Plan 01-02 executed (game engine core)
+Phase: 2 of 5 (Board UI and Drag Interaction)
+Plan: 1 of 3 in current phase
+Status: Plan 02-01 complete, ready for 02-02
+Last activity: 2026-02-17 -- Plan 02-01 executed (Vite/React scaffold + static board render)
 
-Progress: [███░░░░░░░] 13%
+Progress: [████░░░░░░] 27%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 4 min
-- Total execution time: 0.13 hours
+- Total plans completed: 4
+- Average duration: 5 min
+- Total execution time: 0.33 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-game-engine | 2/3 | 8 min | 4 min |
+| 01-game-engine | 3/3 | 13 min | 4 min |
+| 02-board-ui-and-drag-interaction | 1/3 | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5 min), 01-02 (3 min)
+- Last 5 plans: 01-01 (5 min), 01-02 (3 min), 01-03 (5 min), 02-01 (6 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -51,6 +52,10 @@ Recent decisions affecting current work:
 - [01-01]: Added Difficulty type alias for cleaner PuzzleDefinition interface
 - [01-02]: Path validation checks ALL intermediate cells, not just destination -- prevents teleporting past blockers
 - [01-02]: GameEngine as single cohesive class owning all state mutations (move, undo, reset)
+- [02-01]: Gap-aware vehicle positioning: cellSize=(100%-15px)/6, left=col*(cellSize+3px) to align chips over cells despite 3px gaps
+- [02-01]: vehicleLayer uses inset:var(--grid-padding) so 100% reference equals grid area exactly
+- [02-01]: Removed rootDir from tsconfig (TS6059 conflict with vite.config.ts inclusion)
+- [02-01]: Vehicle.size typed as 2|3 not 1 -- size===1 comparison is a TypeScript error
 
 ### Pending Todos
 
@@ -58,12 +63,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- Verify exact npm package versions before scaffolding (research based on May 2025 training data)
 - Verify Howler.js is still actively maintained; Web Audio API fallback exists if needed
 - 80+ puzzle definitions need to be sourced or created with verified solvability
 
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-board-ui-and-drag-interaction/02-CONTEXT.md
+Stopped at: Completed 02-01 (Vite scaffold + static board render)
+Resume file: .planning/phases/02-board-ui-and-drag-interaction/02-02-PLAN.md
