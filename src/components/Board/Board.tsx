@@ -16,7 +16,7 @@ export function Board() {
   });
 
   return (
-    <div className={styles.boardWrapper}>
+    <div className={styles.boardWrapper} data-board>
       <div className={styles.board}>
         {/* Exit marker — gap/cutout on right border at row 3 (index 2) */}
         <div className={styles.exitMarker} aria-label="Exit" />

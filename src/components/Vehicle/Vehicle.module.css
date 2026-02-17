@@ -13,6 +13,22 @@
   cursor: grabbing;
 }
 
+/* Hover highlight — shows vehicle is interactive; suppressed during drag */
+.vehicle:not(.dragging):hover {
+  filter: brightness(1.08);
+  transform: scale(1.02);
+  transition: filter 0.15s, transform 0.15s;
+}
+
+/* Dragging state — lifted shadow, scale, grabbed cursor */
+.dragging {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+  z-index: 100;
+  cursor: grabbing;
+  /* will-change: transform is applied inline by useDrag for performance */
+}
+
 /* === Pseudo-element details for HORIZONTAL cars (size 2) === */
 .car.horizontal::before {
   content: '';

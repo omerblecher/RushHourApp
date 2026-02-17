@@ -1,4 +1,6 @@
 import type { Vehicle as VehicleType } from '../../engine/types';
+import { useGameStore } from '../../store/gameStore';
+import { useDrag } from '../../hooks/useDrag';
 import { getVehicleColor } from '../../utils/vehicleColors';
 import styles from './Vehicle.module.css';
 
@@ -20,6 +22,13 @@ const GAP_PX = 3; // must match --grid-gap in Board.module.css
 export function Vehicle({ vehicle }: VehicleProps) {
   const { id, position, size, orientation } = vehicle;
   const color = getVehicleColor(id);
+  const move = useGameStore((s) => s.move);
+
+  const { ref, isDragging } = useDrag({
+    vehicleId: id,
+    orientation,
+    onMoveCommit: move,
+  });
 
   const isHorizontal = orientation === 'horizontal';
   const isTargetCar = id === 'X';
@@ -77,16 +86,20 @@ export function Vehicle({ vehicle }: VehicleProps) {
     isHorizontal ? styles.horizontal : styles.vertical,
     isTruck ? styles.truck : styles.car,
     isTargetCar ? styles.targetCar : '',
+    isDragging ? styles.dragging : '',
   ]
     .filter(Boolean)
     .join(' ');
 
   return (
     <div
+      ref={ref}
       className={classNames}
       style={{ ...positionStyle, ...colorStyle, ...shadowStyle }}
       data-vehicle-id={id}
       data-orientation={orientation}
+      data-row={row}
+      data-col={col}
       title={`Vehicle ${id}`}
     />
   );
