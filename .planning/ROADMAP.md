@@ -12,8 +12,8 @@ Deliver a fully playable Rush Hour sliding puzzle game as a React SPA with Fireb
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Game Engine** - Pure TypeScript game logic with unit-tested collision detection, move validation, win detection, and BFS solver
-- [ ] **Phase 2: Board UI and Drag Interaction** - Visual game board with CSS-styled vehicles and pointer-event-driven drag system
+- [x] **Phase 1: Game Engine** - Pure TypeScript game logic with unit-tested collision detection, move validation, win detection, and BFS solver
+- [x] **Phase 2: Board UI and Drag Interaction** - Visual game board with CSS-styled vehicles and pointer-event-driven drag system
 - [ ] **Phase 3: Puzzle Data and Navigation** - 80+ puzzle definitions, difficulty-grouped selection UI, routing, and localStorage progress tracking
 - [ ] **Phase 4: Firebase Integration** - Google authentication, anonymous auth, Firestore leaderboards with security rules
 - [ ] **Phase 5: Sound and Polish** - Howler.js sound effects, win animations, keyboard accessibility, and cross-browser verification
@@ -33,9 +33,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Types, grid parser, and board model (TDD)
-- [ ] 01-02-PLAN.md -- GameEngine class: moves, collision, win, undo, reset (TDD)
-- [ ] 01-03-PLAN.md -- BFS solver and barrel export with integration test (TDD)
+- [x] 01-01-PLAN.md -- Types, grid parser, and board model (TDD)
+- [x] 01-02-PLAN.md -- GameEngine class: moves, collision, win, undo, reset (TDD)
+- [x] 01-03-PLAN.md -- BFS solver and barrel export with integration test (TDD)
 
 ### Phase 2: Board UI and Drag Interaction
 **Goal**: Users can see and interact with the puzzle board -- dragging vehicles with mouse or touch on a responsive, visually polished game board
@@ -50,8 +50,9 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [x] 02-01: Board grid, Vehicle CSS art, exit marker, and static rendering
+- [x] 02-02: Drag interaction system, collision bounds, snap animation, GameHUD, and ControlBar
+- [x] 02-03: Human verification of complete board UI and drag interaction (approved)
 
 ### Phase 3: Puzzle Data and Navigation
 **Goal**: Users can browse 80+ puzzles organized by difficulty, select and play any puzzle, and have their progress saved locally
@@ -176,8 +177,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Game Engine | 0/3 | Planning complete | - |
-| 2. Board UI and Drag Interaction | 0/? | Not started | - |
+| 1. Game Engine | 3/3 | Complete | 2026-02-17 |
+| 2. Board UI and Drag Interaction | 3/3 | Complete | 2026-02-19 |
 | 3. Puzzle Data and Navigation | 0/? | Not started | - |
 | 4. Firebase Integration | 0/? | Not started | - |
 | 5. Sound and Polish | 0/? | Not started | - |
