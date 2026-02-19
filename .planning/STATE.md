@@ -74,5 +74,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 02-03 (human verification of board UI and drag interaction) — Phase 2 complete
-Resume file: .planning/phases/03-routing-and-puzzle-selection/03-01-PLAN.md
+Stopped at: Phase 3 context gathered
+Resume file: .planning/phases/03-puzzle-data-and-navigation/03-CONTEXT.md
