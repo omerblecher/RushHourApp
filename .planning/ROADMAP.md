@@ -64,11 +64,12 @@ Plans:
   3. Puzzle selection screen shows completed/uncompleted status and personal best moves/time per puzzle
   4. All puzzles are validated as solvable at build time by the BFS solver, and each has a known minimum move count
   5. Game board screen includes working reset and back controls, and progress persists in localStorage across sessions
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md -- Puzzle data pipeline (80+ puzzles, validation script, puzzleIndex, progressStore)
+- [ ] 03-02-PLAN.md -- Routing + all screens (MainMenu, PuzzleSelect, GameScreen, WinModal, LeaderboardStub)
+- [ ] 03-03-PLAN.md -- Human verification of complete Phase 3 navigation and puzzle experience
 
 ### Phase 4: Firebase Integration
 **Goal**: Users can sign in and compete on global per-puzzle leaderboards with server-enforced data integrity
