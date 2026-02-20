@@ -1,152 +1,152 @@
 [
   {
     "id": "expert-01",
-    "gridString": "L.KKIILEEACBXX.ACBHHDA...JD.FF.JGGG.",
+    "gridString": "..F.II..FCBAXXFCBAEH..JAEHDDJ.GGG...",
     "difficulty": "expert",
-    "minMoves": 15
+    "minMoves": 23
   },
   {
     "id": "expert-02",
-    "gridString": "D.LL..D.CHABXXCHAB..KKAIEJFFFIEJGGG.",
+    "gridString": "KHHH.EK.ACBEXXACBJF..CBJFDGG...DIII.",
     "difficulty": "expert",
-    "minMoves": 15
+    "minMoves": 23
   },
   {
     "id": "expert-03",
-    "gridString": ".EEE....CDBAXXCDBAKIIF.GKLLFJGHHHFJ.",
+    "gridString": "I.KK..I.CDBAXXCDBAJJJDGH.EEEGH..FFFH",
     "difficulty": "expert",
-    "minMoves": 15
+    "minMoves": 23
   },
   {
     "id": "expert-04",
-    "gridString": "FIII..F.CAGBXXCAGBMM..DDHHEEELKKJJ.L",
+    "gridString": "IIIKKF..ACBFXXACB...DDDJG..EEJGHH.LL",
     "difficulty": "expert",
-    "minMoves": 15
+    "minMoves": 23
   },
   {
     "id": "expert-05",
-    "gridString": "JJ.DD..EECABXXFCABGHF...GHKKII.H.LLL",
+    "gridString": "I..EE.I.BAHCXXBAHC.JJ..CGGGDF....DF.",
     "difficulty": "expert",
-    "minMoves": 15
+    "minMoves": 23
   },
   {
     "id": "expert-06",
-    "gridString": "JK.EDDJKCEABXXCFAB..GF.H..GF.HII.LL.",
+    "gridString": "J..GG.J.CDABXXCDABIIIDHL..KKHL.FFFEE",
     "difficulty": "expert",
-    "minMoves": 15
+    "minMoves": 23
   },
   {
     "id": "expert-07",
-    "gridString": "JJJ..H..CBAHXXCBA.KDDILGKEEILG...FFF",
+    "gridString": "CIIDD.C.FB.AXXFB.A.JJBE.GGG.EHKK..EH",
     "difficulty": "expert",
-    "minMoves": 16
+    "minMoves": 23
   },
   {
     "id": "expert-08",
-    "gridString": ".G..HH.GDBACXXDBAC.EEMLLI..MFJI.KKFJ",
+    "gridString": "LJJJ..L.BDACXXBDACIGG.ACIH.KK..HFFEE",
     "difficulty": "expert",
-    "minMoves": 16
+    "minMoves": 23
   },
   {
     "id": "expert-09",
-    "gridString": "M..FFFM.DBACXXDBACJLGG.EJLHHHEKK.III",
+    "gridString": "I..DD.I.LABCXXLABCGGGE.FJK.E.FJK.HH.",
     "difficulty": "expert",
-    "minMoves": 16
+    "minMoves": 23
   },
   {
     "id": "expert-10",
-    "gridString": "KJLL..KJCDABXXCDABEHH.A.E..G.F.IIG.F",
-    "difficulty": "expert",
-    "minMoves": 16
-  },
-  {
-    "id": "expert-11",
-    "gridString": "MKLLLGMKCABGXXCAB...JJBIE.DDDIE.HHFF",
-    "difficulty": "expert",
-    "minMoves": 16
-  },
-  {
-    "id": "expert-12",
-    "gridString": ".EKKD..ECBDAXXCBJA.LLBJ.H.IIJFHGGG.F",
-    "difficulty": "expert",
-    "minMoves": 16
-  },
-  {
-    "id": "expert-13",
-    "gridString": "MH..JJMHACBDXXACBD.EEE.IKK..GIFFLLG.",
-    "difficulty": "expert",
-    "minMoves": 16
-  },
-  {
-    "id": "expert-14",
-    "gridString": ".FKKK..FBDCAXXBDCAIJJDCLI.EHHL..EGGG",
-    "difficulty": "expert",
-    "minMoves": 17
-  },
-  {
-    "id": "expert-15",
-    "gridString": "MI.GGGMICDABXXCDABKFFJJ.KHHH.L...EEL",
-    "difficulty": "expert",
-    "minMoves": 17
-  },
-  {
-    "id": "expert-16",
-    "gridString": "IKKK..I.ABC.XXABCGJDDHHGJ.LLLGEEFF..",
-    "difficulty": "expert",
-    "minMoves": 17
-  },
-  {
-    "id": "expert-17",
-    "gridString": ".KJJJ..KDBACXXDBACH.LLL.HFF.EEIIGGG.",
-    "difficulty": "expert",
-    "minMoves": 17
-  },
-  {
-    "id": "expert-18",
-    "gridString": ".J..HH.JAEBCXXAEBC.DALLKID..FKIGGGFK",
-    "difficulty": "expert",
-    "minMoves": 18
-  },
-  {
-    "id": "expert-19",
-    "gridString": "ELGG..ELBADCXXBADC.JJJIKFF..IK.HHH.K",
-    "difficulty": "expert",
-    "minMoves": 18
-  },
-  {
-    "id": "expert-20",
-    "gridString": "JH.FF.JHACDBXXACDBGGG.IE.LL.IE...KKE",
-    "difficulty": "expert",
-    "minMoves": 19
-  },
-  {
-    "id": "expert-21",
-    "gridString": ".EEEKKLLACGBXXACGBI..C..IDD..H.FFJJH",
-    "difficulty": "expert",
-    "minMoves": 19
-  },
-  {
-    "id": "expert-22",
-    "gridString": ".KHHH..KDABCXXDABC.IILLCJEE.G.J.FFG.",
-    "difficulty": "expert",
-    "minMoves": 19
-  },
-  {
-    "id": "expert-23",
-    "gridString": "..GGG.LLBEACXXBEAC.IIEJJKDDD.HK..FFH",
-    "difficulty": "expert",
-    "minMoves": 20
-  },
-  {
-    "id": "expert-24",
-    "gridString": "F.EEE.F.CAGBXXCAGBH.IIG.HJ.DD.HJKKLL",
+    "gridString": "I.JJJ.I.DABCXXDABCH.DEEKH..LGKFFFLGK",
     "difficulty": "expert",
     "minMoves": 24
   },
   {
-    "id": "expert-25",
-    "gridString": "F.KKIIF.BCA.XXBCAL.JJ.AL.DDD.GHHEE.G",
+    "id": "expert-11",
+    "gridString": "F.JJ..F.DCABXXDCABIIIC...HHHGGKK.EE.",
     "difficulty": "expert",
-    "minMoves": 29
+    "minMoves": 24
+  },
+  {
+    "id": "expert-12",
+    "gridString": "JMFF..JMCABDXXCABD.HHGBL..IG.LKKI.EE",
+    "difficulty": "expert",
+    "minMoves": 24
+  },
+  {
+    "id": "expert-13",
+    "gridString": "JHH...J.DABCXXDABCIIIAEGKKK.EG..FFEG",
+    "difficulty": "expert",
+    "minMoves": 24
+  },
+  {
+    "id": "expert-14",
+    "gridString": "E..FFFE.AC.BXXAC.BG..CD.GHIIDJ.H..DJ",
+    "difficulty": "expert",
+    "minMoves": 24
+  },
+  {
+    "id": "expert-15",
+    "gridString": ".I.EEE.IB.A.XXB.AGCCCD.GKJJDFGKHHHF.",
+    "difficulty": "expert",
+    "minMoves": 24
+  },
+  {
+    "id": "expert-16",
+    "gridString": "FJJ...F.AGBCXXAGBCHHHGIEKKK.IEDDD..E",
+    "difficulty": "expert",
+    "minMoves": 25
+  },
+  {
+    "id": "expert-17",
+    "gridString": "..FFF.JJBACDXXBACDGE..CHGE.KKHG...II",
+    "difficulty": "expert",
+    "minMoves": 25
+  },
+  {
+    "id": "expert-18",
+    "gridString": ".HJJ...HACBDXXACBDFFI.MMK.IG.LKEEG.L",
+    "difficulty": "expert",
+    "minMoves": 26
+  },
+  {
+    "id": "expert-19",
+    "gridString": ".F.EE..FCABDXXCABDGGHA..I.H.K.IJJ.K.",
+    "difficulty": "expert",
+    "minMoves": 26
+  },
+  {
+    "id": "expert-20",
+    "gridString": "EEELL..GGACBXX.ACBFFHACJI.HKKJIDDD.J",
+    "difficulty": "expert",
+    "minMoves": 27
+  },
+  {
+    "id": "expert-21",
+    "gridString": "..CKGG..CKBAXX.FBA...F.JHIIIEJHDDDE.",
+    "difficulty": "expert",
+    "minMoves": 28
+  },
+  {
+    "id": "expert-22",
+    "gridString": "GGGLL.KKCDBAXXCDBAEJJDBIE..HHIFFF..I",
+    "difficulty": "expert",
+    "minMoves": 30
+  },
+  {
+    "id": "expert-23",
+    "gridString": "K.JJJ.K..ACBXXGACBIDGACEIDHH.EI.FFF.",
+    "difficulty": "expert",
+    "minMoves": 31
+  },
+  {
+    "id": "expert-24",
+    "gridString": "....DD..BAGGXXBAI.CEEAI.CFFFJ..HHHJ.",
+    "difficulty": "expert",
+    "minMoves": 32
+  },
+  {
+    "id": "expert-25",
+    "gridString": "KKC.....CJBAXXCJBAGGG..AH..EIIHDDEFF",
+    "difficulty": "expert",
+    "minMoves": 34
   }
 ]

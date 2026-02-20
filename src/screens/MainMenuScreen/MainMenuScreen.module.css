@@ -16,6 +16,16 @@
   text-align: center;
 }
 
+.puzzlePreview {
+  animation: float 4s ease-in-out infinite;
+  margin-bottom: 8px;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
 .title {
   font-size: 4rem;
   font-weight: 900;

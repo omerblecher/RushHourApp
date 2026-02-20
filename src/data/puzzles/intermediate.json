@@ -1,152 +1,152 @@
 [
   {
     "id": "intermediate-01",
-    "gridString": ".K.HH..KCJABXXCJAB.FF.AIG.EEEIGDD..I",
+    "gridString": ".J.FFF.JCDBAXXCDBAIECD.HIE..GH.E..G.",
     "difficulty": "intermediate",
     "minMoves": 8
   },
   {
     "id": "intermediate-02",
-    "gridString": "EE.JJ...C.BAXXCHBAG.CHIFGD.HIF.DKKI.",
+    "gridString": "..F.CC..FDABXXEDAB.HE.JJKHEIIIKH.GGG",
     "difficulty": "intermediate",
     "minMoves": 8
   },
   {
     "id": "intermediate-03",
-    "gridString": ".FFF....DACBXXDACB.JD..EKJ.HGEKIIHGE",
+    "gridString": "DFFFK.D.EAKBXXEAJB.IE.JHGI.CJHGI.C.H",
     "difficulty": "intermediate",
     "minMoves": 8
   },
   {
     "id": "intermediate-04",
-    "gridString": ".D.EE..DCBKAXXCBKA.I.BGJHI..GJH.FFFJ",
+    "gridString": "IE.JJ.IECABDXXCABDFFF.BD...GG..KK.HH",
     "difficulty": "intermediate",
     "minMoves": 8
   },
   {
     "id": "intermediate-05",
-    "gridString": "J.EE.KJ.BACKXXBACHDF.ACHDFI..HD.IGG.",
+    "gridString": "...HH...BADCXXBADCEE..D...FFFJ.GGIIJ",
     "difficulty": "intermediate",
     "minMoves": 8
   },
   {
     "id": "intermediate-06",
-    "gridString": ".GGG...JJCBAXXDCBA.HDEIAFHDEI.FKKEI.",
+    "gridString": "E..FF.E.DBACXXDBAC..IJ.C.HIJ...HIGGG",
     "difficulty": "intermediate",
-    "minMoves": 8
+    "minMoves": 9
   },
   {
     "id": "intermediate-07",
-    "gridString": "KH.JJJKHBDACXXBDACIE..FCIE..F..EGGF.",
+    "gridString": "JJD.KK..DCBAXX.CBA..HHHAIFEEE.IF..GG",
     "difficulty": "intermediate",
-    "minMoves": 8
+    "minMoves": 9
   },
   {
     "id": "intermediate-08",
-    "gridString": ".KKFF...AC.BXXACJBGIECJHGIE..HGDDD..",
+    "gridString": "FK..J.FKCAJBXXCA.BEEC.DBGG.ID.HHHI..",
     "difficulty": "intermediate",
     "minMoves": 9
   },
   {
     "id": "intermediate-09",
-    "gridString": ".K.EEE.KADCBXXADCBJH.DFFJHII..JH..GG",
+    "gridString": "J.CCC.J..BHAXX.BHAGIF.H.GIFD...I.DEE",
     "difficulty": "intermediate",
     "minMoves": 9
   },
   {
     "id": "intermediate-10",
-    "gridString": "JK.GGGJKCBDAXXCBDA.FFBDEHHH..E..IIIE",
+    "gridString": ".H.JJJ.HBCADXXBCAD.KKCFGEE..FGII...G",
     "difficulty": "intermediate",
     "minMoves": 9
   },
   {
     "id": "intermediate-11",
-    "gridString": ".EEE..JJJABCXX.ABCGHHDBFG.ID.F..IKKF",
+    "gridString": "G.FF..G.ACDBXXACDBIJJCDBI..HH.IEEE..",
     "difficulty": "intermediate",
-    "minMoves": 9
+    "minMoves": 10
   },
   {
     "id": "intermediate-12",
-    "gridString": "JDDD..J.B.CAXXBICAGGBI.EFF.KKE..HHH.",
+    "gridString": "....II.EEB.AXX.BCAGGD.CH.JD.CH.JFFFH",
     "difficulty": "intermediate",
-    "minMoves": 9
+    "minMoves": 10
   },
   {
     "id": "intermediate-13",
-    "gridString": "G.FF..G.DACBXXDACBIJJACKI..HHKIEEE.K",
+    "gridString": ".EEE..FFB.ACXXB.ACJIBGKHJI.GKHJIDDDH",
     "difficulty": "intermediate",
     "minMoves": 10
   },
   {
     "id": "intermediate-14",
-    "gridString": "KHHH..K.BDCAXXBDCA.FFD.JIII..J.EEEGG",
+    "gridString": "H.KK..H.BCADXXBCADJEECAGJFFF.G..IIIG",
     "difficulty": "intermediate",
     "minMoves": 10
   },
   {
     "id": "intermediate-15",
-    "gridString": ".FF...JJDBACXXDBAC.GGGACH.IIKKHEEE..",
+    "gridString": "IEEE..I.ABDCXXABDC..A..C.J.HH..JFFGG",
     "difficulty": "intermediate",
-    "minMoves": 10
+    "minMoves": 11
   },
   {
     "id": "intermediate-16",
-    "gridString": "IIKK...DDBACXXFBACJJFEACGGGE.....EHH",
+    "gridString": "IJJ.HHI.DBACXXDBAC..D.F..G..F..GEEF.",
     "difficulty": "intermediate",
-    "minMoves": 10
+    "minMoves": 11
   },
   {
     "id": "intermediate-17",
-    "gridString": "..DDD.IIAKCBXXAKCBF.AHJBFG.HJ..GEEE.",
+    "gridString": "D.JJJ.D.CA.BXXCA.B.EEAG.FHHHGIF...GI",
     "difficulty": "intermediate",
-    "minMoves": 10
+    "minMoves": 11
   },
   {
     "id": "intermediate-18",
-    "gridString": "DD.GGG..ACBKXXACBKIJJC.HI.EEEHFFF..H",
+    "gridString": "JGGG..J.BAC.XXBAC.DHBAFFDH.EEI.H...I",
     "difficulty": "intermediate",
-    "minMoves": 11
+    "minMoves": 12
   },
   {
     "id": "intermediate-19",
-    "gridString": ".GGJJJKKBADCXXBADC...AD.EEH..I..HFFI",
+    "gridString": ".J..HH.JACBDXXACBDKFA.GIKF..GI.FEEEI",
     "difficulty": "intermediate",
-    "minMoves": 11
+    "minMoves": 12
   },
   {
     "id": "intermediate-20",
-    "gridString": ".JJJ..GGAB.CXXAB.CDD.BIKHEE.IKH.FFFK",
+    "gridString": ".FHHJJ.FBCAIXXBCAI.DDD.G.E...G.E....",
     "difficulty": "intermediate",
-    "minMoves": 11
+    "minMoves": 12
   },
   {
     "id": "intermediate-21",
-    "gridString": ".I.KK..IACBDXXACBD.FFCGGEEE..J...HHJ",
+    "gridString": "F..HH.F.DCABXXDCAB.GECII.GEKK..GE.JJ",
     "difficulty": "intermediate",
     "minMoves": 12
   },
   {
     "id": "intermediate-22",
-    "gridString": "D.JJJ.D.CA.BXXCA.B.EEAG.FHHHGIF.KKGI",
+    "gridString": "GJHCCCGJHAB.XXHABD.I..ED.I..ED.FFF..",
     "difficulty": "intermediate",
     "minMoves": 12
   },
   {
     "id": "intermediate-23",
-    "gridString": ".II.H...ABHCXXAB.C..A.DDJFEEEGJFKK.G",
+    "gridString": "GFFF..G.BAC.XXBACDE.B..DEIJJJD.IHH..",
     "difficulty": "intermediate",
-    "minMoves": 12
+    "minMoves": 14
   },
   {
     "id": "intermediate-24",
-    "gridString": ".KKK....CBDAXXCBDA.F.HH.IFEEEGIFJJJG",
+    "gridString": ".E..DD.EJ.ABXXJFABHHCFAGI.CK.GI..K..",
     "difficulty": "intermediate",
-    "minMoves": 12
+    "minMoves": 15
   },
   {
     "id": "intermediate-25",
-    "gridString": "I.GGG.I.BDCAXXBDCA.FBKKAJF.HHHJFEE..",
+    "gridString": "J..GGGJ.DBACXXDBACHH..AC.IEFF..IE...",
     "difficulty": "intermediate",
-    "minMoves": 12
+    "minMoves": 16
   }
 ]

@@ -1,152 +1,152 @@
 [
   {
     "id": "advanced-01",
-    "gridString": "KKJJJ.MMDBCAXXDBCAILL.CEI.HHHEGG.FFE",
+    "gridString": ".FF.HD..BAHDXXBAGDJEE.G.JICCG.JILLKK",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 12
   },
   {
     "id": "advanced-02",
-    "gridString": "K...GGK.CDBAXXCDBAFLHHB.FL.EEIF.JJJI",
+    "gridString": "GLDDDEGLB.AEXXBJA.F..JACFKH..C.KHII.",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 12
   },
   {
     "id": "advanced-03",
-    "gridString": ".JJLLL..ABICXXABICE.GGG.EFFF.H.DDKKH",
+    "gridString": "FM.GG.FMBLACXXBLACEHHDJJE..D..KKII..",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 12
   },
   {
     "id": "advanced-04",
-    "gridString": "MH.EE.MHABCDXXABCD.JJ.CDKFGGG.KFLLII",
+    "gridString": "HIII..H.ACDBXXACDB.GGFJB.LLFJ..KKEEE",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 12
   },
   {
     "id": "advanced-05",
-    "gridString": ".LLHH.GGCABJXXCABJ.K...J.KFFDD.EEEII",
+    "gridString": "HEE...H.CBAJXXCBAJ.DLGG..DL.FIKK..FI",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 12
   },
   {
     "id": "advanced-06",
-    "gridString": "GLJJJ.GLCBA.XXCBAKE..FFKEDDD.H...IIH",
+    "gridString": "D.JJ.ED.ACBEXXACBF.IMLGF.IMLGFKKHHH.",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 12
   },
   {
     "id": "advanced-07",
-    "gridString": "LFHHH.LFADCBXXADCB.JGDC.KJG..IK.GEEI",
+    "gridString": ".LLIIIMMC.BAXXCDBAEHJDBKEHJ..K.HFFGG",
     "difficulty": "advanced",
     "minMoves": 13
   },
   {
     "id": "advanced-08",
-    "gridString": "FL.KK.FLAEBCXXAEBCD.AJJIDHH..ID..GGG",
+    "gridString": "LEGGHHLEABC.XXABCKIDABFKID..FMNNJJ.M",
     "difficulty": "advanced",
     "minMoves": 13
   },
   {
     "id": "advanced-09",
-    "gridString": ".JJ.FF..DCABXXDCAB.GG.LLHEEE.KH.II.K",
+    "gridString": "JLL...J.DABCXXDABCGG.KK.III.FHEEE.FH",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 14
   },
   {
     "id": "advanced-10",
-    "gridString": "LD.EE.LDAGCBXXAGCBII.GFF..JKK...J.HH",
+    "gridString": "LKKJJ.L.FFBAXXD.BA.MDIHEGMDIHEG.CCCE",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 14
   },
   {
     "id": "advanced-11",
-    "gridString": "KLHHH.KLBDCAXXBDCA.IID..G.JJJEGFFF.E",
+    "gridString": "GL.JJJGLCBA.XXCBA...C.DDFII..EFKKHHE",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 14
   },
   {
     "id": "advanced-12",
-    "gridString": "JJKKK.LLACDBXXACDB.GGCDEI.HHHEIFFF..",
+    "gridString": "LJKKKFLJCABFXXCAB...IIBHE.DDDHE.GG..",
     "difficulty": "advanced",
-    "minMoves": 13
+    "minMoves": 14
   },
   {
     "id": "advanced-13",
-    "gridString": "FFF.D...CBDAXXCB.AIGGBH.I.KKHEJJJ.HE",
+    "gridString": ".I.LL..I.AEBXXDAEBGGDC.K...CJKFFHHJ.",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 16
   },
   {
     "id": "advanced-14",
-    "gridString": ".G.LLL.GDCBAXXDCBAJ.HHK.JFF.KI...EEI",
+    "gridString": "GII..JG.BACJXXBACJH.FFEEHD.L...D.LKK",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 16
   },
   {
     "id": "advanced-15",
-    "gridString": ".EEE....DBACXXDBAC...LIJHKKLIJHGGGFF",
+    "gridString": ".E.JJH.EABCHXXABCKGIII.KG.FLDKG.FLD.",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 17
   },
   {
     "id": "advanced-16",
-    "gridString": "JJGGG...CADBXXCADBL.I.KKLHI..ELHFFFE",
+    "gridString": "IG.KK.IGBCA.XXBCALDD.CFL..E.FJHHE..J",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 17
   },
   {
     "id": "advanced-17",
-    "gridString": ".IFFF..IBDCAXXBDCA.GGD..H.EEEJHKKLLJ",
+    "gridString": ".F.II..FCADBXXCADBH.C..BH..EEE..GGJJ",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 17
   },
   {
     "id": "advanced-18",
-    "gridString": "J..DDDJ.CEBAXXCEBAHFF..AHIKKK..I..GG",
+    "gridString": "..FFF...A.B.XXA.BCJ.ADGCJEEDGH.IID.H",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 17
   },
   {
     "id": "advanced-19",
-    "gridString": "KEE...K.B.CAXXBHCAGGGHFF.IIJJJLLDD..",
+    "gridString": ".GG.....JBACXXJBAC..EB.CIFE.DDIF.HH.",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 17
   },
   {
     "id": "advanced-20",
-    "gridString": "HIII..H.DCABXXDCAB..DJJBFF.G...EEGKK",
+    "gridString": ".GGG..KKA.CBXXAECBJ..E.IJ.DHHIFFDLLL",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 18
   },
   {
     "id": "advanced-21",
-    "gridString": "KE.DD.KEA.BCXXA.BCF.IIICFJ.GGGFJHHLL",
+    "gridString": "..JJJ.HHHCABXXICABG.ICADG.F..D..FEE.",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 18
   },
   {
     "id": "advanced-22",
-    "gridString": "F.EEE.F.ABDCXXABDCKK.BDJIHHH.JI...GG",
+    "gridString": "GGG.JJ..DACBXXDACBEIIA.BE.FF......HH",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 18
   },
   {
     "id": "advanced-23",
-    "gridString": "HF..IIHFACDBXXACDB.JKLLE.JK..E.J.GG.",
+    "gridString": "C..HHHC.A.BKXXAFBKI.AFDDIJJJ.EIGGG.E",
     "difficulty": "advanced",
-    "minMoves": 14
+    "minMoves": 18
   },
   {
     "id": "advanced-24",
-    "gridString": ".F.KK..FACDBXXACDBG.AC.HG.IIEHJJ..EH",
+    "gridString": "LEEEF.L.ABFCXXAB.C.IIKKCGJDDD.GJMMHH",
     "difficulty": "advanced",
-    "minMoves": 15
+    "minMoves": 20
   },
   {
     "id": "advanced-25",
-    "gridString": ".II.DDEEEBCAXX.BCAGGFBC.K.F..JK.HHHJ",
+    "gridString": "....FF..ABCDXXABCD..A.HEIGG.HEIJJJ.E",
     "difficulty": "advanced",
-    "minMoves": 16
+    "minMoves": 21
   }
 ]
