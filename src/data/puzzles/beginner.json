@@ -1,0 +1,152 @@
+[
+  {
+    "id": "beginner-01",
+    "gridString": "AD....AD.BB.AD.XX......E.FF..E...CC.",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-02",
+    "gridString": ".BBB.........XX...A..C..A..C.....C..",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-03",
+    "gridString": "..C.....C.....XX.......BA....BA....B",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-04",
+    "gridString": "B.G...B.GAAABFFXX.....C..EDDC..E....",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-05",
+    "gridString": "...CC...DDD...XX..A....BA....B.....B",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-06",
+    "gridString": "............CC.XX.....BADE..BADE..BA",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-07",
+    "gridString": "BB...D.CCC.D.XX.........EE.......AAA",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-08",
+    "gridString": "......EE....ADXX..AD.CCC....B.....B.",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-09",
+    "gridString": "..............XX.....BBB....AA......",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-10",
+    "gridString": "..FFB.DDD.B....XX...EEE..CCC.A.....A",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-11",
+    "gridString": "...............XX....BB.........AAA.",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-12",
+    "gridString": "..FA....FA..XX.......EECB....CB.DD.C",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-13",
+    "gridString": "F..AA.F.....DXX...D.....BB..EE..CC..",
+    "difficulty": "beginner",
+    "minMoves": 1
+  },
+  {
+    "id": "beginner-14",
+    "gridString": "...........A...XXA.....ABBB.........",
+    "difficulty": "beginner",
+    "minMoves": 2
+  },
+  {
+    "id": "beginner-15",
+    "gridString": ".C.....C....XX..A.....A.BB..........",
+    "difficulty": "beginner",
+    "minMoves": 2
+  },
+  {
+    "id": "beginner-16",
+    "gridString": "AA..CC.F..BB.FXX.G...D.GEE.D........",
+    "difficulty": "beginner",
+    "minMoves": 2
+  },
+  {
+    "id": "beginner-17",
+    "gridString": "...BB......C.XX..CDDD............AAA",
+    "difficulty": "beginner",
+    "minMoves": 2
+  },
+  {
+    "id": "beginner-18",
+    "gridString": ".DDA.....AEEXX.C.....C...........BBB",
+    "difficulty": "beginner",
+    "minMoves": 2
+  },
+  {
+    "id": "beginner-19",
+    "gridString": "........AA..XX...B.....B............",
+    "difficulty": "beginner",
+    "minMoves": 2
+  },
+  {
+    "id": "beginner-20",
+    "gridString": ".............XX.A.....A........BB...",
+    "difficulty": "beginner",
+    "minMoves": 2
+  },
+  {
+    "id": "beginner-21",
+    "gridString": "..AA........XX..B.....B....C.....C..",
+    "difficulty": "beginner",
+    "minMoves": 2
+  },
+  {
+    "id": "beginner-22",
+    "gridString": ".FFF.B....DBXX..DB..AAD.E.....ECCC..",
+    "difficulty": "beginner",
+    "minMoves": 3
+  },
+  {
+    "id": "beginner-23",
+    "gridString": "...CCC....BB.XXED....EDF.AA..FGGG...",
+    "difficulty": "beginner",
+    "minMoves": 3
+  },
+  {
+    "id": "beginner-24",
+    "gridString": ".......CCA.DXX.A.D.....D....BB......",
+    "difficulty": "beginner",
+    "minMoves": 4
+  },
+  {
+    "id": "beginner-25",
+    "gridString": ".............XX.A...C.A...C.A...CBB.",
+    "difficulty": "beginner",
+    "minMoves": 6
+  }
+]
