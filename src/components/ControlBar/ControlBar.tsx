@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router';
 import { useGameStore } from '../../store/gameStore';
 import styles from './ControlBar.module.css';
 
 export function ControlBar() {
+  const navigate = useNavigate();
   const undo = useGameStore((s) => s.undo);
   const reset = useGameStore((s) => s.reset);
   const moveCount = useGameStore((s) => s.state?.moveCount ?? 0);
@@ -11,8 +13,7 @@ export function ControlBar() {
   const canReset = moveCount > 0;
 
   const handleMenu = () => {
-    // Navigation not yet implemented — Phase 3 adds routing
-    alert('Menu coming soon!');
+    navigate(-1);
   };
 
   return (

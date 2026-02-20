@@ -1,0 +1,119 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.card {
+  background: #2a1a08;
+  border: 2px solid rgba(245, 200, 66, 0.4);
+  border-radius: 16px;
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.heading {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #f5c842;
+  margin: 0;
+  text-align: center;
+}
+
+.optimalBadge {
+  background: #4caf50;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+
+.stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #c49a6c;
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f5e6c8;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.primaryButton {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a0f00;
+  background: #f5c842;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #b8912e;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.primaryButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #b8912e;
+}
+
+.primaryButton:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #b8912e;
+}
+
+.secondaryButton {
+  width: 100%;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #c49a6c;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.secondaryButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f5e6c8;
+}
