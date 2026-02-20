@@ -173,7 +173,7 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | REQ-027 | Phase 3 | Complete |
 | REQ-028 | Phase 1 | Pending |
 | REQ-029 | Phase 1 | Pending |
-| REQ-030 | Phase 3 | Pending |
+| REQ-030 | Phase 3 | Complete |
 | REQ-031 | Phase 3 | Complete |
 | REQ-032 | Phase 3 | Complete |
 | REQ-033 | Phase 5 | Pending |
@@ -191,12 +191,12 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | REQ-045 | Phase 4 | Pending |
 | REQ-046 | Phase 4 | Pending |
 | REQ-047 | Phase 4 | Pending |
-| REQ-048 | Phase 3 | Pending |
-| REQ-049 | Phase 3 | Pending |
-| REQ-050 | Phase 3 | Pending |
-| REQ-051 | Phase 3 | Pending |
-| REQ-052 | Phase 3 | Pending |
-| REQ-053 | Phase 3 | Pending |
+| REQ-048 | Phase 3 | Complete |
+| REQ-049 | Phase 3 | Complete |
+| REQ-050 | Phase 3 | Complete |
+| REQ-051 | Phase 3 | Complete |
+| REQ-052 | Phase 3 | Complete |
+| REQ-053 | Phase 3 | Complete |
 | NFR-001 | Phase 2 | Pending |
 | NFR-002 | Phase 5 | Pending |
 | NFR-003 | Phase 5 | Pending |

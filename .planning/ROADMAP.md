@@ -67,8 +67,8 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- Puzzle data pipeline (80+ puzzles, validation script, puzzleIndex, progressStore)
-- [ ] 03-02-PLAN.md -- Routing + all screens (MainMenu, PuzzleSelect, GameScreen, WinModal, LeaderboardStub)
+- [x] 03-01-PLAN.md -- Puzzle data pipeline (80+ puzzles, validation script, puzzleIndex, progressStore)
+- [x] 03-02-PLAN.md -- Routing + all screens (MainMenu, PuzzleSelect, GameScreen, WinModal, LeaderboardStub)
 - [ ] 03-03-PLAN.md -- Human verification of complete Phase 3 navigation and puzzle experience
 
 ### Phase 4: Firebase Integration
@@ -180,6 +180,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Game Engine | 3/3 | Complete | 2026-02-17 |
 | 2. Board UI and Drag Interaction | 3/3 | Complete | 2026-02-19 |
-| 3. Puzzle Data and Navigation | 0/? | Not started | - |
+| 3. Puzzle Data and Navigation | 2/3 | In progress | - |
 | 4. Firebase Integration | 0/? | Not started | - |
 | 5. Sound and Polish | 0/? | Not started | - |
