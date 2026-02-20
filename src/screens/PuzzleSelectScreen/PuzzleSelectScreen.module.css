@@ -1,0 +1,46 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #1a0f00;
+  color: #f5e6c8;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.backButton {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #c49a6c;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f5e6c8;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f5e6c8;
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.1rem;
+  }
+}

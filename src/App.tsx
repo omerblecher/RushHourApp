@@ -1,33 +1,19 @@
-import { useEffect } from 'react';
-import { useGameStore } from './store/gameStore';
-import { Board } from './components/Board/Board';
-import { GameHUD } from './components/GameHUD/GameHUD';
-import { ControlBar } from './components/ControlBar/ControlBar';
+import { Routes, Route } from 'react-router';
+import { MainMenuScreen } from './screens/MainMenuScreen/MainMenuScreen';
+import { PuzzleSelectScreen } from './screens/PuzzleSelectScreen/PuzzleSelectScreen';
+import { GameScreen } from './screens/GameScreen/GameScreen';
+import { LeaderboardScreen } from './screens/LeaderboardScreen/LeaderboardScreen';
 import styles from './App.module.css';
 
-// Test puzzle for Phase 2 development (36 chars, X on row 2 = exit row)
-// Row 0: . . A A . .
-// Row 1: . . . . . B
-// Row 2: X X . . . B   <- X at (2,0)-(2,1), path open to exit
-// Row 3: . . . . C C
-// Row 4: . D D . . .
-// Row 5: . . . . . .
-const DEV_PUZZLE = '..AA.......BXX...B....CC.DD.........';
-const DEV_MIN_MOVES = 8;
-
 function App() {
-  const loadPuzzle = useGameStore((s) => s.loadPuzzle);
-
-  useEffect(() => {
-    loadPuzzle(DEV_PUZZLE, DEV_MIN_MOVES);
-  }, [loadPuzzle]);
-
   return (
     <div className={styles.app}>
-      <h1 className={styles.title}>Rush Hour</h1>
-      <GameHUD />
-      <Board />
-      <ControlBar />
+      <Routes>
+        <Route path="/" element={<MainMenuScreen />} />
+        <Route path="/puzzles" element={<PuzzleSelectScreen />} />
+        <Route path="/play/:difficulty/:puzzleId" element={<GameScreen />} />
+        <Route path="/leaderboard/:difficulty/:puzzleId" element={<LeaderboardScreen />} />
+      </Routes>
     </div>
   );
 }

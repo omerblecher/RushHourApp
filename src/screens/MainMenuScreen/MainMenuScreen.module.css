@@ -1,0 +1,69 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #1a0f00;
+  padding: 24px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #f5c842;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #c49a6c;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.playButton {
+  margin-top: 24px;
+  padding: 16px 64px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #1a0f00;
+  background: #f5c842;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #b8912e, 0 6px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.playButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #b8912e, 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.playButton:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #b8912e, 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 2.8rem;
+  }
+
+  .playButton {
+    padding: 14px 48px;
+    font-size: 1.1rem;
+  }
+}
