@@ -65,7 +65,7 @@ Each task was committed atomically:
 1. **Task 1: Add mute toggle stub to ControlBar** - `ca04ee4` (feat)
 2. **Task 2: Annotate REQUIREMENTS.md to close Gap 1 (REQ-032 false positive)** - `054e94d` (docs)
 
-**Plan metadata:** (docs commit follows)
+**Plan metadata:** `e2c937a` (docs: complete gap closure plan)
 
 ## Files Created/Modified
 - `src/components/ControlBar/ControlBar.tsx` - Added isMuted state (localStorage lazy init), handleMute toggle handler, and fourth Mute button with aria-pressed and emoji icons
@@ -94,3 +94,11 @@ None - no external service configuration required.
 ---
 *Phase: 03-puzzle-data-and-navigation*
 *Completed: 2026-02-20*
+
+## Self-Check: PASSED
+
+- FOUND: src/components/ControlBar/ControlBar.tsx
+- FOUND: .planning/REQUIREMENTS.md
+- FOUND: .planning/phases/03-puzzle-data-and-navigation/03-04-SUMMARY.md
+- FOUND commit: ca04ee4 (feat: mute toggle button)
+- FOUND commit: 054e94d (docs: REQ-032 annotation)
