@@ -65,7 +65,7 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | REQ-029 | All puzzles validated as solvable by BFS solver at build time | MUST |
 | REQ-030 | Puzzle selection screen grouped by difficulty | MUST |
 | REQ-031 | Visual indicator of completed/uncompleted puzzles | SHOULD |
-| REQ-032 | Personal best moves/time shown per puzzle | SHOULD |
+| REQ-032 | Personal best moves/time shown per puzzle (shown in WinModal per user decision; tiles show checkmark only) | SHOULD |
 
 ### Sound Effects
 
@@ -175,7 +175,7 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | REQ-029 | Phase 1 | Pending |
 | REQ-030 | Phase 3 | Complete |
 | REQ-031 | Phase 3 | Complete |
-| REQ-032 | Phase 3 | Complete |
+| REQ-032 | Phase 3 | Complete — satisfied via WinModal (tiles show checkmark only per CONTEXT.md) |
 | REQ-033 | Phase 5 | Pending |
 | REQ-034 | Phase 5 | Pending |
 | REQ-035 | Phase 5 | Pending |
