@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** A fun, polished Rush Hour sliding puzzle game where players drag vehicles on a 6x6 grid to free the red car, competing on global leaderboards
-**Current focus:** Phase 4 in progress — Firebase Auth + Leaderboards (Plan 04 complete)
+**Current focus:** Phase 4 complete — ready for Phase 5 Polish
 
 ## Current Position
 
-Phase: 4 of 5 (Firebase Integration) — IN PROGRESS
-Plan: 4 of 5 in current phase — Plan 04-04 complete
-Status: Phase 04 Plan 04 complete; ready for Plan 04-05 (anonymous upgrade, ProfileScreen)
-Last activity: 2026-02-21 -- Plan 04-04 executed (score submission, WinModal rank/PB, real LeaderboardScreen, PuzzleTile leaderboard button)
+Phase: 4 of 5 (Firebase Integration) — COMPLETE
+Plan: 5 of 5 in current phase — Plan 04-05 complete
+Status: Phase 04 complete; ready for Phase 05 (polish — Howler.js sound, keyboard nav, win animations)
+Last activity: 2026-02-21 -- Plan 04-05 executed (upgradeAnonymousToGoogle, ProfileScreen, LeaderboardModal upgrade gate)
 
-Progress: [█████████░] 92% (12/13 plans complete)
+Progress: [██████████] 100% (13/13 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 12 min
-- Total execution time: 2.02 hours
+- Total plans completed: 13
+- Average duration: 10 min
+- Total execution time: 2.1 hours
 
 **By Phase:**
 
@@ -30,14 +30,13 @@ Progress: [█████████░] 92% (12/13 plans complete)
 | 01-game-engine | 3/3 | 13 min | 4 min |
 | 02-board-ui-and-drag-interaction | 3/3 | 10 min | 3 min |
 | 03-puzzle-data-and-navigation | 4/4 | 87 min | 22 min |
-| 04-firebase-integration | 4/5 | 23 min | 6 min |
+| 04-firebase-integration | 5/5 | 26 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (15 min), 04-02 (3 min), 04-03 (2 min), 04-04 (3 min)
-- Trend: 04-04 very fast; all wiring followed plan exactly with no deviations
+- Last 5 plans: 04-02 (3 min), 04-03 (2 min), 04-04 (3 min), 04-05 (3 min)
+- Trend: Phase 04 very fast; all plans followed spec with no deviations
 
 *Updated after each plan completion*
-| Phase 04-firebase-integration P05 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -87,9 +86,9 @@ Recent decisions affecting current work:
 - [04-04]: WinModal owns useLeaderboard call internally -- avoids threading rank state through GameScreen
 - [04-04]: PuzzleSelectScreen opens LeaderboardModal as overlay (not navigation) for consistency with WinModal
 - [04-04]: Leaderboard trophy button visible only on tile hover (opacity:0 -> opacity:0.8) to avoid cluttering the grid
-- [Phase 04-05]: Anonymous upgrade wired internally in LeaderboardModal (onSignInToCompete prop kept for backward compat)
-- [Phase 04-05]: ProfileScreen shows display name form only for non-anonymous users; anon users see upgrade notice
-- [Phase 04-05]: Personal stats sourced from progressStore (localStorage), not Firestore leaderboard data
+- [04-05]: Anonymous upgrade wired internally in LeaderboardModal (onSignInToCompete prop kept for backward compat)
+- [04-05]: ProfileScreen shows display name form only for non-anonymous users; anon users see upgrade notice
+- [04-05]: Personal stats sourced from progressStore (localStorage), not Firestore leaderboard data
 
 ### Pending Todos
 
@@ -103,5 +102,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed Phase 04 Plan 04 (score submission, WinModal rank/PB/leaderboard button, real LeaderboardScreen, PuzzleTile leaderboard trophy)
-Resume file: .planning/phases/04-firebase-integration/04-04-SUMMARY.md
+Stopped at: Completed Phase 04 Plan 05 (upgradeAnonymousToGoogle + signOut in authStore, ProfileScreen, LeaderboardModal upgrade gate wiring)
+Resume file: .planning/phases/04-firebase-integration/04-05-SUMMARY.md
