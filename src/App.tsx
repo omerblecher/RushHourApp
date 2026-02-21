@@ -5,6 +5,7 @@ import { MainMenuScreen } from './screens/MainMenuScreen/MainMenuScreen';
 import { PuzzleSelectScreen } from './screens/PuzzleSelectScreen/PuzzleSelectScreen';
 import { GameScreen } from './screens/GameScreen/GameScreen';
 import { LeaderboardScreen } from './screens/LeaderboardScreen/LeaderboardScreen';
+import { ProfileScreen } from './screens/ProfileScreen/ProfileScreen';
 import styles from './App.module.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
         <Route path="/puzzles" element={<PuzzleSelectScreen />} />
         <Route path="/play/:difficulty/:puzzleId" element={<GameScreen />} />
         <Route path="/leaderboard/:difficulty/:puzzleId" element={<LeaderboardScreen />} />
+        <Route path="/profile" element={<ProfileScreen />} />
       </Routes>
     </div>
   );

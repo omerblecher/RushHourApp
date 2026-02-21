@@ -96,6 +96,16 @@ export function MainMenuScreen() {
 
   return (
     <div className={styles.container}>
+      {/* Profile button — top-right corner */}
+      <button
+        className={styles.profileButton}
+        onClick={() => navigate('/profile')}
+        aria-label="View profile"
+        title="Profile"
+      >
+        Profile
+      </button>
+
       <div className={styles.content}>
         <div className={styles.puzzlePreview}>
           <PuzzlePreview />
