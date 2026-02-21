@@ -84,7 +84,7 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Firebase init, authStore, AuthPromptScreen (blocking launch auth gate)
+- [x] 04-01-PLAN.md — Firebase init, authStore, AuthPromptScreen (blocking launch auth gate)
 - [ ] 04-02-PLAN.md — Firestore security rules, composite index, scoreService + displayName service
 - [ ] 04-03-PLAN.md — useLeaderboard hook + LeaderboardModal component
 - [ ] 04-04-PLAN.md — Game integration: score submission, WinModal rank/PB, LeaderboardScreen, PuzzleSelect leaderboard
@@ -184,5 +184,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Game Engine | 3/3 | Complete | 2026-02-17 |
 | 2. Board UI and Drag Interaction | 3/3 | Complete | 2026-02-19 |
 | 3. Puzzle Data and Navigation | 4/4 | Complete | 2026-02-20 |
-| 4. Firebase Integration | 0/6 | Not started | - |
+| 4. Firebase Integration | 1/6 | In Progress | - |
 | 5. Sound and Polish | 0/? | Not started | - |

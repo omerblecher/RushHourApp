@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** A fun, polished Rush Hour sliding puzzle game where players drag vehicles on a 6x6 grid to free the red car, competing on global leaderboards
-**Current focus:** Phase 3 complete — ready for Phase 4 (Firebase Auth + Leaderboards)
+**Current focus:** Phase 4 in progress — Firebase Auth + Leaderboards (Plan 01 complete)
 
 ## Current Position
 
-Phase: 3 of 5 (Puzzle Data and Navigation) — COMPLETE
-Plan: 4 of 4 in current phase — Plan 03-04 complete
-Status: Phase 03 all plans complete, ready for Phase 04
-Last activity: 2026-02-20 -- Plan 03-04 executed (mute toggle stub in ControlBar, REQ-032 annotation)
+Phase: 4 of 5 (Firebase Integration) — IN PROGRESS
+Plan: 1 of 5 in current phase — Plan 04-01 complete
+Status: Phase 04 Plan 01 complete; ready for Plan 04-02 (score submission)
+Last activity: 2026-02-21 -- Plan 04-01 executed (Firebase auth, authStore, AuthPromptScreen, App.tsx gate)
 
-Progress: [████████░░] 61% (8/13 plans complete)
+Progress: [█████████░] 69% (9/13 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: 13 min
-- Total execution time: 1.82 hours
+- Total execution time: 1.97 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [████████░░] 61% (8/13 plans complete)
 | 01-game-engine | 3/3 | 13 min | 4 min |
 | 02-board-ui-and-drag-interaction | 3/3 | 10 min | 3 min |
 | 03-puzzle-data-and-navigation | 4/4 | 87 min | 22 min |
+| 04-firebase-integration | 1/5 | 15 min | 15 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (2 min), 02-03 (2 min), 03-01 (70 min), 03-02 (12 min), 03-04 (5 min)
-- Trend: 03-04 fast; gap closure tasks were surgical (stub + annotation only)
+- Last 5 plans: 03-01 (70 min), 03-02 (12 min), 03-04 (5 min), 04-01 (15 min)
+- Trend: 04-01 fast; Firebase SDK pre-installed, tasks executed cleanly
 
 *Updated after each plan completion*
 
@@ -70,6 +71,10 @@ Recent decisions affecting current work:
 - [03-02]: ControlBar navigate(-1) replaces alert() placeholder -- generic back navigation works in any routing context
 - [03-04]: Mute toggle is Phase 3 stub; Phase 5 reads 'rushhour_muted' localStorage key on Howler.js init
 - [03-04]: REQ-032 false positive -- personal best shown in WinModal per locked CONTEXT.md decision (tiles show checkmark only)
+- [04-01]: No Zustand persist for auth -- Firebase SDK owns persistence in IndexedDB; user object stored in memory only
+- [04-01]: initAuth() called in main.tsx before createRoot() so listener is active before first React render
+- [04-01]: isLoading gate in App.tsx prevents AuthPromptScreen flash for returning users with valid sessions
+- [04-01]: Modular Firebase imports only -- deprecated namespaced API not used
 
 ### Pending Todos
 
@@ -82,6 +87,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: Completed Phase 03 Plan 04 (mute toggle stub, REQ-032 annotation — Phase 3 complete)
-Resume file: .planning/phases/03-puzzle-data-and-navigation/03-04-SUMMARY.md
+Last session: 2026-02-21
+Stopped at: Completed Phase 04 Plan 01 (Firebase auth init, authStore, AuthPromptScreen, App.tsx auth gate)
+Resume file: .planning/phases/04-firebase-integration/04-01-SUMMARY.md
