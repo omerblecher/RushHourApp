@@ -149,7 +149,7 @@ All 61 v1 requirements mapped. No orphans.
 | REQ-035 | 5 | Sound Effects |
 | REQ-036 | 5 | Sound Effects |
 | REQ-037 | 5 | Sound Effects |
-| REQ-038 | 4 | 3/6 | In Progress|  | 4 | Firebase Auth |
+| REQ-038 | 4 | 5/6 | In Progress|  | 4 | Firebase Auth |
 | REQ-040 | 4 | Firebase Auth |
 | REQ-041 | 4 | Firebase Auth |
 | REQ-042 | 4 | Global Leaderboards |

@@ -183,14 +183,14 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | REQ-037 | Phase 5 | Pending |
 | REQ-038 | Phase 4 | Complete — Google sign-in via signInWithPopup in AuthPromptScreen |
 | REQ-039 | Phase 4 | Complete — Anonymous auth via signInAnonymously in AuthPromptScreen |
-| REQ-040 | Phase 4 | Pending |
+| REQ-040 | Phase 4 | Complete |
 | REQ-041 | Phase 4 | Complete — displayName from Google user object used in authStore |
 | REQ-042 | Phase 4 | Complete |
 | REQ-043 | Phase 4 | Complete |
 | REQ-044 | Phase 4 | Complete |
 | REQ-045 | Phase 4 | Complete |
 | REQ-046 | Phase 4 | Complete |
-| REQ-047 | Phase 4 | Pending |
+| REQ-047 | Phase 4 | Complete |
 | REQ-048 | Phase 3 | Complete |
 | REQ-049 | Phase 3 | Complete |
 | REQ-050 | Phase 3 | Complete |
