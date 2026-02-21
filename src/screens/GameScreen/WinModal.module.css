@@ -31,6 +31,18 @@
   text-align: center;
 }
 
+.personalBestBanner {
+  background: linear-gradient(135deg, #b8860b, #f5c842);
+  color: #1a0f00;
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 6px 20px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(245, 200, 66, 0.4);
+}
+
 .optimalBadge {
   background: #4caf50;
   color: #fff;
@@ -66,6 +78,32 @@
 .statValue {
   font-size: 1.1rem;
   font-weight: 700;
+  color: #f5e6c8;
+}
+
+.rankDisplay {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #f5c842;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.viewLeaderboardButton {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #c49a6c;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.viewLeaderboardButton:hover {
+  background: rgba(255, 255, 255, 0.08);
   color: #f5e6c8;
 }
 
