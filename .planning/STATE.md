@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** A fun, polished Rush Hour sliding puzzle game where players drag vehicles on a 6x6 grid to free the red car, competing on global leaderboards
-**Current focus:** Phase 4 in progress — Firebase Auth + Leaderboards (Plan 01 complete)
+**Current focus:** Phase 4 in progress — Firebase Auth + Leaderboards (Plan 03 complete)
 
 ## Current Position
 
 Phase: 4 of 5 (Firebase Integration) — IN PROGRESS
-Plan: 1 of 5 in current phase — Plan 04-01 complete
-Status: Phase 04 Plan 01 complete; ready for Plan 04-02 (score submission)
-Last activity: 2026-02-21 -- Plan 04-01 executed (Firebase auth, authStore, AuthPromptScreen, App.tsx gate)
+Plan: 3 of 5 in current phase — Plan 04-03 complete
+Status: Phase 04 Plan 03 complete; ready for Plan 04-04 (WinModal + leaderboard integration)
+Last activity: 2026-02-21 -- Plan 04-03 executed (useLeaderboard hook, LeaderboardModal component, formatTime utility)
 
-Progress: [█████████░] 69% (9/13 plans complete)
+Progress: [█████████░] 85% (11/13 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 13 min
-- Total execution time: 1.97 hours
+- Total plans completed: 10
+- Average duration: 12 min
+- Total execution time: 2.02 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [█████████░] 69% (9/13 plans complete)
 | 01-game-engine | 3/3 | 13 min | 4 min |
 | 02-board-ui-and-drag-interaction | 3/3 | 10 min | 3 min |
 | 03-puzzle-data-and-navigation | 4/4 | 87 min | 22 min |
-| 04-firebase-integration | 1/5 | 15 min | 15 min |
+| 04-firebase-integration | 2/5 | 18 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (70 min), 03-02 (12 min), 03-04 (5 min), 04-01 (15 min)
-- Trend: 04-01 fast; Firebase SDK pre-installed, tasks executed cleanly
+- Last 5 plans: 03-02 (12 min), 03-04 (5 min), 04-01 (15 min), 04-02 (3 min)
+- Trend: 04-02 very fast; rules and service layer straightforward with clear research
 
 *Updated after each plan completion*
 
@@ -75,6 +75,10 @@ Recent decisions affecting current work:
 - [04-01]: initAuth() called in main.tsx before createRoot() so listener is active before first React render
 - [04-01]: isLoading gate in App.tsx prevents AuthPromptScreen flash for returning users with valid sessions
 - [04-01]: Modular Firebase imports only -- deprecated namespaced API not used
+- [04-02]: submitScore() uses optimistic write + silent rejection: security rule rejects non-improvements, client swallows error silently
+- [04-02]: mergeAnonymousScores() iterates ALL_PUZZLES client-side (no collectionGroup query) -- anon user docs can't be queried by uid server-side
+- [04-02]: Display name length: 2-20 chars (Claude's discretion per CONTEXT.md)
+- [04-02]: ScoreDoc interface exported from scoreService for consistent typing in leaderboard hook
 
 ### Pending Todos
 
@@ -88,5 +92,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed Phase 04 Plan 01 (Firebase auth init, authStore, AuthPromptScreen, App.tsx auth gate)
-Resume file: .planning/phases/04-firebase-integration/04-01-SUMMARY.md
+Stopped at: Completed Phase 04 Plan 02 (Firestore security rules, composite index, scoreService with silent submitScore, atomic setDisplayName, mergeAnonymousScores)
+Resume file: .planning/phases/04-firebase-integration/04-02-SUMMARY.md

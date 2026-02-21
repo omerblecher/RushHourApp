@@ -187,9 +187,9 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | REQ-041 | Phase 4 | Complete — displayName from Google user object used in authStore |
 | REQ-042 | Phase 4 | Pending |
 | REQ-043 | Phase 4 | Pending |
-| REQ-044 | Phase 4 | Pending |
-| REQ-045 | Phase 4 | Pending |
-| REQ-046 | Phase 4 | Pending |
+| REQ-044 | Phase 4 | Complete |
+| REQ-045 | Phase 4 | Complete |
+| REQ-046 | Phase 4 | Complete |
 | REQ-047 | Phase 4 | Pending |
 | REQ-048 | Phase 3 | Complete |
 | REQ-049 | Phase 3 | Complete |
@@ -202,6 +202,6 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | NFR-003 | Phase 5 | Pending |
 | NFR-004 | Phase 1 | Pending |
 | NFR-005 | Phase 5 | Pending |
-| NFR-006 | Phase 4 | Pending |
+| NFR-006 | Phase 4 | Complete |
 | NFR-007 | Phase 5 | Pending |
 | NFR-008 | Phase 2 | Pending |
