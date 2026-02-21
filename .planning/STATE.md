@@ -30,11 +30,11 @@ Progress: [█████████░] 85% (11/13 plans complete)
 | 01-game-engine | 3/3 | 13 min | 4 min |
 | 02-board-ui-and-drag-interaction | 3/3 | 10 min | 3 min |
 | 03-puzzle-data-and-navigation | 4/4 | 87 min | 22 min |
-| 04-firebase-integration | 2/5 | 18 min | 9 min |
+| 04-firebase-integration | 3/5 | 20 min | 7 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (12 min), 03-04 (5 min), 04-01 (15 min), 04-02 (3 min)
-- Trend: 04-02 very fast; rules and service layer straightforward with clear research
+- Last 5 plans: 03-04 (5 min), 04-01 (15 min), 04-02 (3 min), 04-03 (2 min)
+- Trend: 04-03 very fast; hook and modal followed plan exactly with no deviations
 
 *Updated after each plan completion*
 
@@ -79,6 +79,9 @@ Recent decisions affecting current work:
 - [04-02]: mergeAnonymousScores() iterates ALL_PUZZLES client-side (no collectionGroup query) -- anon user docs can't be queried by uid server-side
 - [04-02]: Display name length: 2-20 chars (Claude's discretion per CONTEXT.md)
 - [04-02]: ScoreDoc interface exported from scoreService for consistent typing in leaderboard hook
+- [04-03]: getDocs over onSnapshot for leaderboard -- one-time read is cheaper; live updates not needed since modal is ephemeral
+- [04-03]: formatTime extracted to src/utils/formatTime.ts -- avoids duplication between WinModal and LeaderboardModal
+- [04-03]: rank=-1 sentinel for pinned out-of-top-50 entry -- consumers check rank === -1 to skip rank display
 
 ### Pending Todos
 
@@ -92,5 +95,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed Phase 04 Plan 02 (Firestore security rules, composite index, scoreService with silent submitScore, atomic setDisplayName, mergeAnonymousScores)
-Resume file: .planning/phases/04-firebase-integration/04-02-SUMMARY.md
+Stopped at: Completed Phase 04 Plan 03 (useLeaderboard hook, LeaderboardModal component with loading/anon-gate/user-highlight, formatTime utility)
+Resume file: .planning/phases/04-firebase-integration/04-03-SUMMARY.md
