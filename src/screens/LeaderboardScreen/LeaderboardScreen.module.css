@@ -5,6 +5,7 @@
   background: #1a0f00;
   color: #f5e6c8;
   padding: 20px;
+  gap: 20px;
 }
 
 .backButton {
@@ -29,21 +30,162 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   flex: 1;
-  gap: 12px;
-  text-align: center;
+  gap: 16px;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: #f5c842;
   margin: 0;
+  text-align: center;
 }
 
-.comingSoon {
-  font-size: 1.1rem;
+.errorMessage {
+  font-size: 1rem;
   color: #c49a6c;
+  margin: 0;
+}
+
+/* Loading skeleton */
+.skeletonList {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeletonRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+}
+
+.skeletonCell {
+  height: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* Empty state */
+.emptyMessage {
+  font-size: 1rem;
+  color: #c49a6c;
+  margin: 0;
+}
+
+/* Table */
+.tableWrapper {
+  width: 100%;
+  max-width: 600px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 8px 10px;
+  color: #c49a6c;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.thRank { width: 2.5rem; }
+.thName { }
+.thMoves { width: 4.5rem; text-align: right; }
+.thTime { width: 4.5rem; text-align: right; }
+
+.row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.1s ease;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.row td {
+  padding: 10px 10px;
+  color: #f5e6c8;
+}
+
+.tdRank {
+  color: #c49a6c;
+  font-size: 0.85rem;
+}
+
+.tdName {
+  font-weight: 500;
+}
+
+.tdMoves {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tdTime {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #c49a6c;
+}
+
+/* Current user row */
+.userRow {
+  background: rgba(245, 200, 66, 0.08);
+}
+
+.userRow td {
+  color: #f5c842;
+}
+
+/* Pinned row (user outside top 50) */
+.separator {
+  text-align: center;
+  color: #c49a6c;
+  padding: 4px 0;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+}
+
+.pinnedRow {
+  background: rgba(245, 200, 66, 0.06);
+}
+
+.pinnedRow td {
+  color: #f5c842;
+}
+
+.yourBestLabel {
+  font-size: 0.75rem;
+  color: #c49a6c;
+  margin-right: 4px;
+  font-weight: 400;
+}
+
+/* Anonymous note */
+.anonNote {
+  font-size: 0.9rem;
+  color: #c49a6c;
+  text-align: center;
   margin: 0;
 }

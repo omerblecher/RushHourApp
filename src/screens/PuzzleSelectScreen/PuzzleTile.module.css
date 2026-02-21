@@ -49,6 +49,30 @@
   line-height: 1;
 }
 
+/* Leaderboard icon button — absolute in top-left corner of tile */
+.leaderboardBtn {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  font-size: 0.65rem;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+}
+
+.tile:hover .leaderboardBtn,
+.tile:focus-within .leaderboardBtn {
+  opacity: 0.8;
+}
+
+.leaderboardBtn:hover {
+  opacity: 1 !important;
+  background: rgba(245, 200, 66, 0.15);
+}
+
 @media (max-width: 480px) {
   .number {
     font-size: 0.9rem;
