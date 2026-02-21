@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { useLeaderboard } from '../../hooks/useLeaderboard';
 import { formatTime } from '../../utils/formatTime';
@@ -6,14 +7,34 @@ import styles from './LeaderboardModal.module.css';
 interface LeaderboardModalProps {
   puzzleId: string;
   onClose: () => void;
-  onSignInToCompete?: () => void; // called when anon user clicks "Sign in to compete"
+  onSignInToCompete?: () => void; // kept for backward compatibility; internal upgrade flow is used if not provided
 }
 
 export function LeaderboardModal({ puzzleId, onClose, onSignInToCompete }: LeaderboardModalProps) {
   const user = useAuthStore((s) => s.user);
+  const upgradeStatus = useAuthStore((s) => s.upgradeStatus);
+  const upgradeAnonymousToGoogle = useAuthStore((s) => s.upgradeAnonymousToGoogle);
   const { entries, userEntry, isLoading } = useLeaderboard(puzzleId);
 
+  const [upgradeError, setUpgradeError] = useState<string | null>(null);
+
   const isAnonymous = user?.isAnonymous === true;
+  const isUpgrading = upgradeStatus === 'upgrading';
+
+  const handleSignInToCompete = async () => {
+    if (onSignInToCompete) {
+      onSignInToCompete();
+      return;
+    }
+    setUpgradeError(null);
+    const result = await upgradeAnonymousToGoogle();
+    if (result === 'error') {
+      setUpgradeError('Sign in failed. Please try again.');
+    } else if (result === 'cancelled') {
+      // User dismissed the popup — no error shown
+    }
+    // 'linked' or 'merged': onAuthStateChanged updates store, modal re-renders
+  };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
@@ -48,10 +69,15 @@ export function LeaderboardModal({ puzzleId, onClose, onSignInToCompete }: Leade
             <p className={styles.anonMessage}>
               Sign in to compete on the global leaderboard
             </p>
-            {onSignInToCompete && (
-              <button className={styles.signInButton} onClick={onSignInToCompete}>
-                Sign in with Google
-              </button>
+            <button
+              className={styles.signInButton}
+              onClick={handleSignInToCompete}
+              disabled={isUpgrading}
+            >
+              {isUpgrading ? 'Signing in...' : 'Sign in with Google'}
+            </button>
+            {upgradeError && (
+              <p className={styles.upgradeError}>{upgradeError}</p>
             )}
           </div>
         )}
