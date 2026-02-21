@@ -81,11 +81,15 @@ Plans:
   3. Only the user's best attempt per puzzle is stored; scores are immutable (no user update or delete)
   4. Firestore security rules enforce that users can only submit their own scores, moves are positive integers, and scores cannot be tampered with
   5. Leaderboard view is accessible from both puzzle completion and puzzle selection screens
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — Firebase init, authStore, AuthPromptScreen (blocking launch auth gate)
+- [ ] 04-02-PLAN.md — Firestore security rules, composite index, scoreService + displayName service
+- [ ] 04-03-PLAN.md — useLeaderboard hook + LeaderboardModal component
+- [ ] 04-04-PLAN.md — Game integration: score submission, WinModal rank/PB, LeaderboardScreen, PuzzleSelect leaderboard
+- [ ] 04-05-PLAN.md — ProfileScreen, anonymous-to-Google upgrade flow, sign out
+- [ ] 04-06-PLAN.md — Deploy rules + human verification of all Phase 4 flows
 
 ### Phase 5: Sound and Polish
 **Goal**: The game feels complete with sound feedback, celebration animations, keyboard accessibility, and cross-browser quality
@@ -179,6 +183,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Game Engine | 3/3 | Complete | 2026-02-17 |
 | 2. Board UI and Drag Interaction | 3/3 | Complete | 2026-02-19 |
-| 3. Puzzle Data and Navigation | 2/3 | In progress | - |
-| 4. Firebase Integration | 0/? | Not started | - |
+| 3. Puzzle Data and Navigation | 4/4 | Complete | 2026-02-20 |
+| 4. Firebase Integration | 0/6 | Not started | - |
 | 5. Sound and Polish | 0/? | Not started | - |
