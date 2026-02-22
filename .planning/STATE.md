@@ -2,17 +2,17 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-16)
+See: .planning/PROJECT.md (updated 2026-02-22)
 
-**Core value:** A fun, polished Rush Hour sliding puzzle game where players drag vehicles on a 6x6 grid to free the red car, competing on global leaderboards
-**Current focus:** Phase 5 COMPLETE — all 4 plans executed, NFR-002/003/007 satisfied, v1.0 milestone ready
+**Core value:** An accessible, polished Rush Hour puzzle game that feels satisfying to play — drag mechanics, snap animation, and progression feedback keep players coming back
+**Current focus:** v1.0 SHIPPED — planning next milestone (v1.1)
 
 ## Current Position
 
+Milestone: v1.0 Rush Hour MVP — COMPLETE (shipped 2026-02-22)
 Phase: 5 of 5 (Sound and Polish) — COMPLETE
-Plan: 4 of 4 in current phase — Plan 05-04 complete (Phase 5 done)
-Status: Phase 05 complete; bundle 192.67 KB gzip (NFR-002 met); offline verified (NFR-003); cross-browser verified Chrome/Firefox/Safari/Edge (NFR-007); all Phase 5 features working
-Last activity: 2026-02-22 -- Plan 05-04 executed (bundle size fix via dynamic imports, human verification approved)
+Status: All 61 requirements satisfied; 5 phases, 20 plans complete; git tagged v1.0
+Last activity: 2026-02-22 — v1.0 milestone archived and tagged
 
 Progress: [██████████] 100% (19/19 plans complete)
 
