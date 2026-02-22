@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { useGameStore } from '../store/gameStore';
+import { soundService } from '../services/soundService';
 import type { Vehicle } from '../engine/types';
 
 const GRID_SIZE = 6;
@@ -178,6 +179,7 @@ export function useDrag({
         el.style.zIndex = '';
 
         if (newRow !== startRow || newCol !== startCol) {
+          soundService.playSlide();
           onMoveCommitRef.current(vehicleIdRef.current, newRow, newCol);
         }
       }, SNAP_DURATION_MS);

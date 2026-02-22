@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
+import confetti from 'canvas-confetti';
 import { useGameStore } from '../../store/gameStore';
 import { useProgressStore } from '../../store/progressStore';
 import { getPuzzleById } from '../../data/puzzleIndex';
 import { submitScore } from '../../services/scoreService';
+import { soundService } from '../../services/soundService';
 import { Board } from '../../components/Board/Board';
 import { GameHUD } from '../../components/GameHUD/GameHUD';
 import { ControlBar } from '../../components/ControlBar/ControlBar';
+import { GameHeader } from '../../components/GameHeader/GameHeader';
 import { WinModal } from './WinModal';
 import styles from './GameScreen.module.css';
 
@@ -22,6 +25,7 @@ export function GameScreen() {
 
   const [showWinModal, setShowWinModal] = useState(false);
   const [isNewPersonalBest, setIsNewPersonalBest] = useState(false);
+  const [isWinAnimating, setIsWinAnimating] = useState(false);
 
   // Load puzzle when puzzleId changes
   useEffect(() => {
@@ -37,17 +41,19 @@ export function GameScreen() {
     }
 
     loadPuzzle(puzzle.gridString, puzzle.minMoves);
+    soundService.playStart();
     setShowWinModal(false);
     setIsNewPersonalBest(false);
+    setIsWinAnimating(false);
   }, [puzzleId, loadPuzzle, navigate]);
 
-  // Detect win
+  // Detect win and run celebration sequence
   useEffect(() => {
     if (state?.isWon && puzzleId && state.startTime && state.endTime) {
       const timeMs = state.endTime - state.startTime;
       const moves = state.moveCount;
 
-      // Compute personal best BEFORE recordCompletion updates the store
+      // Compute personal best BEFORE recordCompletion mutates the store
       const prevBest = getBest(puzzleId);
       const newPB =
         !prevBest ||
@@ -55,13 +61,29 @@ export function GameScreen() {
         (moves === prevBest.bestMoves && timeMs < prevBest.bestTimeMs);
 
       setIsNewPersonalBest(newPB);
-
       recordCompletion(puzzleId, moves, timeMs);
-
-      // Submit score silently in the background (no await — fire-and-forget)
       void submitScore(puzzleId, moves, timeMs, minMoves);
 
-      setShowWinModal(true);
+      // Win celebration sequence (animation first, then WinModal)
+      soundService.playWin();
+
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { x: 0.5, y: 0.6 },
+        colors: ['#e63946', '#f5c842', '#4a90d9', '#2ecc71', '#9b59b6'],
+        gravity: 1.2,
+        scalar: 0.9,
+      });
+
+      setIsWinAnimating(true);
+
+      const timer = setTimeout(() => {
+        setIsWinAnimating(false);
+        setShowWinModal(true);
+      }, 2000);
+
+      return () => clearTimeout(timer);
     }
   }, [state?.isWon]);
 
@@ -75,8 +97,9 @@ export function GameScreen() {
 
   return (
     <div className={styles.container}>
+      <GameHeader />
       <GameHUD />
-      <Board />
+      <Board isWinAnimating={isWinAnimating} />
       <ControlBar />
       {showWinModal && puzzleId && (
         <WinModal
