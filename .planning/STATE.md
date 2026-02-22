@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** A fun, polished Rush Hour sliding puzzle game where players drag vehicles on a 6x6 grid to free the red car, competing on global leaderboards
-**Current focus:** Phase 4 complete — ready for Phase 5 Polish
+**Current focus:** Phase 5 in progress — sound foundation and header UI complete
 
 ## Current Position
 
-Phase: 4 of 5 (Firebase Integration) — COMPLETE
-Plan: 5 of 5 in current phase — Plan 04-05 complete
-Status: Phase 04 complete; ready for Phase 05 (polish — Howler.js sound, keyboard nav, win animations)
-Last activity: 2026-02-21 -- Plan 04-05 executed (upgradeAnonymousToGoogle, ProfileScreen, LeaderboardModal upgrade gate)
+Phase: 5 of 5 (Sound and Polish) — IN PROGRESS
+Plan: 1 of 5 in current phase — Plan 05-01 complete
+Status: Phase 05 started; soundService + GameHeader + HelpModal + AboutModal built; ready for 05-02
+Last activity: 2026-02-22 -- Plan 05-01 executed (soundService singleton, GameHeader, HelpModal, AboutModal)
 
-Progress: [██████████] 100% (13/13 plans complete)
+Progress: [██████████] 74% (14/19 plans complete)
 
 ## Performance Metrics
 
@@ -32,9 +32,15 @@ Progress: [██████████] 100% (13/13 plans complete)
 | 03-puzzle-data-and-navigation | 4/4 | 87 min | 22 min |
 | 04-firebase-integration | 5/5 | 26 min | 5 min |
 
+**By Phase (continued):**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| 05-sound-and-polish | 1/5 | 27 min | 27 min |
+
 **Recent Trend:**
-- Last 5 plans: 04-02 (3 min), 04-03 (2 min), 04-04 (3 min), 04-05 (3 min)
-- Trend: Phase 04 very fast; all plans followed spec with no deviations
+- Last 5 plans: 04-03 (2 min), 04-04 (3 min), 04-05 (3 min), 05-01 (27 min)
+- Trend: Phase 05 sound+assets slower due to dependency installation and external sourcing
 
 *Updated after each plan completion*
 
@@ -89,6 +95,7 @@ Recent decisions affecting current work:
 - [04-05]: Anonymous upgrade wired internally in LeaderboardModal (onSignInToCompete prop kept for backward compat)
 - [04-05]: ProfileScreen shows display name form only for non-anonymous users; anon users see upgrade notice
 - [04-05]: Personal stats sourced from progressStore (localStorage), not Firestore leaderboard data
+- [Phase 05-01]: soundService is a module-level singleton (Howl instances created once at load) to prevent audio context exhaustion; Howler.mute() used for global mute with localStorage persistence
 
 ### Pending Todos
 
@@ -101,6 +108,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-21
-Stopped at: Completed Phase 04 Plan 05 (upgradeAnonymousToGoogle + signOut in authStore, ProfileScreen, LeaderboardModal upgrade gate wiring)
-Resume file: .planning/phases/04-firebase-integration/04-05-SUMMARY.md
+Last session: 2026-02-22
+Stopped at: Completed 05-01-PLAN.md (soundService singleton, GameHeader, HelpModal, AboutModal)
+Resume file: .planning/phases/05-sound-and-polish/05-01-SUMMARY.md

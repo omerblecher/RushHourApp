@@ -176,11 +176,11 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | REQ-030 | Phase 3 | Complete |
 | REQ-031 | Phase 3 | Complete |
 | REQ-032 | Phase 3 | Complete — satisfied via WinModal (tiles show checkmark only per CONTEXT.md) |
-| REQ-033 | Phase 5 | Pending |
-| REQ-034 | Phase 5 | Pending |
-| REQ-035 | Phase 5 | Pending |
-| REQ-036 | Phase 5 | Pending |
-| REQ-037 | Phase 5 | Pending |
+| REQ-033 | Phase 5 | Complete |
+| REQ-034 | Phase 5 | Complete |
+| REQ-035 | Phase 5 | Complete |
+| REQ-036 | Phase 5 | Complete |
+| REQ-037 | Phase 5 | Complete |
 | REQ-038 | Phase 4 | Complete — Google sign-in via signInWithPopup in AuthPromptScreen |
 | REQ-039 | Phase 4 | Complete — Anonymous auth via signInAnonymously in AuthPromptScreen |
 | REQ-040 | Phase 4 | Complete |
@@ -198,8 +198,8 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | REQ-052 | Phase 3 | Complete |
 | REQ-053 | Phase 3 | Complete |
 | NFR-001 | Phase 2 | Pending |
-| NFR-002 | Phase 5 | Pending |
-| NFR-003 | Phase 5 | Pending |
+| NFR-002 | Phase 5 | Complete |
+| NFR-003 | Phase 5 | Complete |
 | NFR-004 | Phase 1 | Pending |
 | NFR-005 | Phase 5 | Pending |
 | NFR-006 | Phase 4 | Complete |

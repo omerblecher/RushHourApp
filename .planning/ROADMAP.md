@@ -130,8 +130,7 @@ All 61 v1 requirements mapped. No orphans.
 | REQ-013 | 2 | Drag and Touch Interaction |
 | REQ-014 | 2 | Drag and Touch Interaction |
 | REQ-015 | 2 | Drag and Touch Interaction |
-| REQ-016 | 5 | Keyboard Accessibility |
-| REQ-017 | 2 | Drag and Touch Interaction |
+| REQ-016 | 5 | 1/4 | In Progress|  | 2 | Drag and Touch Interaction |
 | REQ-018 | 2 | Visual Design |
 | REQ-019 | 2 | Visual Design |
 | REQ-020 | 2 | Visual Design |
