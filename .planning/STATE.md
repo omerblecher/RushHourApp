@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** A fun, polished Rush Hour sliding puzzle game where players drag vehicles on a 6x6 grid to free the red car, competing on global leaderboards
-**Current focus:** Phase 5 in progress — sound foundation and header UI complete
+**Current focus:** Phase 5 in progress — audio triggers and win celebration sequence complete
 
 ## Current Position
 
 Phase: 5 of 5 (Sound and Polish) — IN PROGRESS
-Plan: 1 of 5 in current phase — Plan 05-01 complete
-Status: Phase 05 started; soundService + GameHeader + HelpModal + AboutModal built; ready for 05-02
-Last activity: 2026-02-22 -- Plan 05-01 executed (soundService singleton, GameHeader, HelpModal, AboutModal)
+Plan: 2 of 5 in current phase — Plan 05-02 complete
+Status: Phase 05 audio triggers wired; win celebration (confetti + glow + WinModal delay) implemented; GameHeader integrated; ready for 05-03
+Last activity: 2026-02-22 -- Plan 05-02 executed (slide/win/start sounds, confetti, board glow, GameHeader in GameScreen, ControlBar mute removed)
 
-Progress: [██████████] 74% (14/19 plans complete)
+Progress: [██████████] 79% (15/19 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 15
 - Average duration: 10 min
-- Total execution time: 2.1 hours
+- Total execution time: 2.3 hours
 
 **By Phase:**
 
@@ -36,11 +36,11 @@ Progress: [██████████] 74% (14/19 plans complete)
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 05-sound-and-polish | 1/5 | 27 min | 27 min |
+| 05-sound-and-polish | 2/5 | 37 min | 18 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-03 (2 min), 04-04 (3 min), 04-05 (3 min), 05-01 (27 min)
-- Trend: Phase 05 sound+assets slower due to dependency installation and external sourcing
+- Last 5 plans: 04-04 (3 min), 04-05 (3 min), 05-01 (27 min), 05-02 (10 min)
+- Trend: Phase 05 sound+assets stabilizing; 05-02 faster than 05-01 (no dependency installs needed)
 
 *Updated after each plan completion*
 
@@ -96,6 +96,10 @@ Recent decisions affecting current work:
 - [04-05]: ProfileScreen shows display name form only for non-anonymous users; anon users see upgrade notice
 - [04-05]: Personal stats sourced from progressStore (localStorage), not Firestore leaderboard data
 - [Phase 05-01]: soundService is a module-level singleton (Howl instances created once at load) to prevent audio context exhaustion; Howler.mute() used for global mute with localStorage persistence
+- [Phase 05-02]: playSlide() fires in snapTimerRef callback ONLY when cell changed -- prevents 60fps audio spam during drag
+- [Phase 05-02]: Win sequence uses setTimeout(2000) with useEffect cleanup to prevent memory leak if user navigates during animation
+- [Phase 05-02]: Board input locked via pointer-events:none on both boardWrapper and vehicleLayer during win animation (belt-and-suspenders)
+- [Phase 05-02]: ControlBar mute button removed; GameHeader is single mute control surface
 
 ### Pending Todos
 
@@ -109,5 +113,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 05-01-PLAN.md (soundService singleton, GameHeader, HelpModal, AboutModal)
-Resume file: .planning/phases/05-sound-and-polish/05-01-SUMMARY.md
+Stopped at: Completed 05-02-PLAN.md (audio triggers, win celebration, GameHeader integration, ControlBar cleanup)
+Resume file: .planning/phases/05-sound-and-polish/05-02-SUMMARY.md
