@@ -182,3 +182,27 @@
       0 0 0 2px #b71c1c, 0 0 22px rgba(229, 57, 53, 0.85);
   }
 }
+
+/* Keyboard focus + selection highlight (user decision: highlight + subtle glow) */
+/* Note: box-shadow is also applied via inline focusedShadow style in Vehicle.tsx
+   to ensure it overrides the inline shadowStyle on all vehicles including target car */
+.focused {
+  outline: 3px solid #f5c842;
+  outline-offset: 2px;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.4),
+    0 0 12px rgba(245, 200, 66, 0.6),
+    0 0 24px rgba(245, 200, 66, 0.3);
+  z-index: 50;
+}
+
+/* Suppress default browser focus ring — we use our own focused ring */
+.vehicle:focus {
+  outline: none;
+}
+
+/* Show our custom ring only on keyboard focus via :focus-visible */
+.vehicle:focus-visible:not(.focused) {
+  outline: 2px solid rgba(245, 200, 66, 0.5);
+  outline-offset: 2px;
+}

@@ -6,6 +6,8 @@ import styles from './Vehicle.module.css';
 
 interface VehicleProps {
   vehicle: VehicleType;
+  isSelected?: boolean;
+  onSelect?: (id: string) => void;
 }
 
 const GRID_SIZE = 6;
@@ -19,7 +21,7 @@ const GAP_PX = 3; // must match --grid-gap in Board.module.css
  *   left/top = col * (cellSize + GAP)
  *   width = size * cellSize + (size - 1) * GAP
  */
-export function Vehicle({ vehicle }: VehicleProps) {
+export function Vehicle({ vehicle, isSelected = false, onSelect }: VehicleProps) {
   const { id, position, size, orientation } = vehicle;
   const color = getVehicleColor(id);
   const move = useGameStore((s) => s.move);
@@ -81,12 +83,20 @@ export function Vehicle({ vehicle }: VehicleProps) {
     boxShadow: `0 3px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35), 0 0 0 2px ${color.border}`,
   };
 
+  // Merge focused shadow on top if selected — inline styles win over CSS classes,
+  // so we apply the gold focus ring via inline style for all vehicles (incl. target car)
+  const focusedShadow: React.CSSProperties = isSelected ? {
+    boxShadow: `0 3px 8px rgba(0,0,0,0.4), 0 0 12px rgba(245,200,66,0.6), 0 0 24px rgba(245,200,66,0.3), inset 0 1px 0 rgba(255,255,255,0.35), 0 0 0 3px #f5c842`,
+    zIndex: 50,
+  } : {};
+
   const classNames = [
     styles.vehicle,
     isHorizontal ? styles.horizontal : styles.vertical,
     isTruck ? styles.truck : styles.car,
     isTargetCar ? styles.targetCar : '',
     isDragging ? styles.dragging : '',
+    isSelected ? styles.focused : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -95,11 +105,17 @@ export function Vehicle({ vehicle }: VehicleProps) {
     <div
       ref={ref}
       className={classNames}
-      style={{ ...positionStyle, ...colorStyle, ...shadowStyle }}
+      style={{ ...positionStyle, ...colorStyle, ...shadowStyle, ...focusedShadow }}
       data-vehicle-id={id}
       data-orientation={orientation}
       data-row={row}
       data-col={col}
+      tabIndex={0}
+      role="gridcell"
+      aria-label={`${isTargetCar ? 'Target car' : `Vehicle ${id}`}, ${orientation}, ${size === 3 ? 'truck' : 'car'}`}
+      aria-selected={isSelected}
+      onClick={() => onSelect?.(id)}
+      onFocus={() => onSelect?.(id)}
       title={`Vehicle ${id}`}
     />
   );
