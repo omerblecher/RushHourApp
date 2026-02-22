@@ -1,0 +1,58 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: #2a1f16;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f5f0e8;
+}
+
+.title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 16px;
+  color: #f5c842;
+}
+
+.body {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.body ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.body li {
+  margin-bottom: 4px;
+}
+
+.closeButton {
+  width: 100%;
+  padding: 10px;
+  background: #4a3728;
+  color: #f5f0e8;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.closeButton:hover {
+  background: #5a4738;
+}
