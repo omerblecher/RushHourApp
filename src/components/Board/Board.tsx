@@ -5,7 +5,11 @@ import styles from './Board.module.css';
 
 const GRID_SIZE = 6;
 
-export function Board() {
+interface BoardProps {
+  isWinAnimating: boolean;
+}
+
+export function Board({ isWinAnimating }: BoardProps) {
   const state = useGameStore((s) => s.state);
 
   // Render 36 grid cells
@@ -16,8 +20,12 @@ export function Board() {
   });
 
   return (
-    <div className={styles.boardWrapper} data-board>
-      <div className={styles.board}>
+    <div
+      className={styles.boardWrapper}
+      data-board
+      style={isWinAnimating ? { pointerEvents: 'none' } : undefined}
+    >
+      <div className={[styles.board, isWinAnimating ? styles.winGlow : ''].filter(Boolean).join(' ')}>
         {/* Exit marker — gap/cutout on right border at row 3 (index 2) */}
         <div className={styles.exitMarker} aria-label="Exit" />
 
@@ -27,7 +35,10 @@ export function Board() {
         </div>
 
         {/* Vehicle layer absolutely positioned over the grid */}
-        <div className={styles.vehicleLayer}>
+        <div
+          className={styles.vehicleLayer}
+          style={isWinAnimating ? { pointerEvents: 'none' } : undefined}
+        >
           {state?.vehicles.map((vehicle) => (
             <Vehicle key={vehicle.id} vehicle={vehicle} />
           ))}

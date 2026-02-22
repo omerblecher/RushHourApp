@@ -1,9 +1,6 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useGameStore } from '../../store/gameStore';
 import styles from './ControlBar.module.css';
-
-const MUTE_KEY = 'rushhour_muted';
 
 export function ControlBar() {
   const navigate = useNavigate();
@@ -12,21 +9,11 @@ export function ControlBar() {
   const moveCount = useGameStore((s) => s.state?.moveCount ?? 0);
   const historyLength = useGameStore((s) => s.state?.moveHistory.length ?? 0);
 
-  const [isMuted, setIsMuted] = useState<boolean>(
-    () => localStorage.getItem(MUTE_KEY) === 'true'
-  );
-
   const canUndo = historyLength > 0;
   const canReset = moveCount > 0;
 
   const handleMenu = () => {
     navigate(-1);
-  };
-
-  const handleMute = () => {
-    const next = !isMuted;
-    setIsMuted(next);
-    localStorage.setItem(MUTE_KEY, String(next));
   };
 
   return (
@@ -61,17 +48,6 @@ export function ControlBar() {
       >
         <span className={styles.icon} aria-hidden="true">☰</span>
         <span className={styles.label}>Menu</span>
-      </button>
-
-      <button
-        className={styles.button}
-        onClick={handleMute}
-        title={isMuted ? 'Unmute sound' : 'Mute sound'}
-        aria-label={isMuted ? 'Unmute sound' : 'Mute sound'}
-        aria-pressed={isMuted}
-      >
-        <span className={styles.icon} aria-hidden="true">{isMuted ? '🔇' : '🔊'}</span>
-        <span className={styles.label}>{isMuted ? 'Unmute' : 'Mute'}</span>
       </button>
     </div>
   );
