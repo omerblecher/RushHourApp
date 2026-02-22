@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import confetti from 'canvas-confetti';
 import { useGameStore } from '../../store/gameStore';
 import { useProgressStore } from '../../store/progressStore';
 import { getPuzzleById } from '../../data/puzzleIndex';
@@ -67,13 +66,15 @@ export function GameScreen() {
       // Win celebration sequence (animation first, then WinModal)
       soundService.playWin();
 
-      confetti({
-        particleCount: 150,
-        spread: 100,
-        origin: { x: 0.5, y: 0.6 },
-        colors: ['#e63946', '#f5c842', '#4a90d9', '#2ecc71', '#9b59b6'],
-        gravity: 1.2,
-        scalar: 0.9,
+      void import('canvas-confetti').then(({ default: confetti }) => {
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { x: 0.5, y: 0.6 },
+          colors: ['#e63946', '#f5c842', '#4a90d9', '#2ecc71', '#9b59b6'],
+          gravity: 1.2,
+          scalar: 0.9,
+        });
       });
 
       setIsWinAnimating(true);

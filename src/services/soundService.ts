@@ -1,44 +1,52 @@
-import { Howl, Howler } from 'howler';
-
 const MUTE_KEY = 'rushhour_muted';
 
-// Create Howl instances once at module load
-const slideSound = new Howl({
-  src: ['/sounds/slide.mp3'],
-  volume: 0.6,
-  preload: true,
-});
+// Howler instances are created lazily on first use to avoid adding
+// howler to the initial JS bundle (saves ~10 KB gzip on initial load).
+let slideSound: import('howler').Howl | null = null;
+let winSound: import('howler').Howl | null = null;
+let startSound: import('howler').Howl | null = null;
 
-const winSound = new Howl({
-  src: ['/sounds/win.mp3'],
-  volume: 0.8,
-  preload: true,
-});
+async function getHowler() {
+  const { Howl, Howler } = await import('howler');
 
-const startSound = new Howl({
-  src: ['/sounds/level-start.mp3'],
-  volume: 0.7,
-  preload: true,
-});
+  if (!slideSound) {
+    slideSound = new Howl({ src: ['/sounds/slide.mp3'], volume: 0.6, preload: true });
+  }
+  if (!winSound) {
+    winSound = new Howl({ src: ['/sounds/win.mp3'], volume: 0.8, preload: true });
+  }
+  if (!startSound) {
+    startSound = new Howl({ src: ['/sounds/level-start.mp3'], volume: 0.7, preload: true });
+  }
 
-// Apply persisted mute state immediately on module load
-// Howler.mute(true) silences ALL Howl instances globally
-const savedMuted = localStorage.getItem(MUTE_KEY) === 'true';
-Howler.mute(savedMuted);
+  // Apply persisted mute state each time we (re)initialize Howler
+  const savedMuted = localStorage.getItem(MUTE_KEY) === 'true';
+  Howler.mute(savedMuted);
+
+  return { Howl, Howler, slideSound: slideSound!, winSound: winSound!, startSound: startSound! };
+}
 
 export const soundService = {
-  playSlide: () => slideSound.play(),
-  playWin: () => winSound.play(),
-  playStart: () => startSound.play(),
+  playSlide: () => {
+    void getHowler().then(({ slideSound }) => slideSound.play());
+  },
+  playWin: () => {
+    void getHowler().then(({ winSound }) => winSound.play());
+  },
+  playStart: () => {
+    void getHowler().then(({ startSound }) => startSound.play());
+  },
 
   setMuted: (muted: boolean) => {
-    Howler.mute(muted);
     localStorage.setItem(MUTE_KEY, String(muted));
+    void import('howler').then(({ Howler }) => Howler.mute(muted));
   },
 
   isMuted: (): boolean => localStorage.getItem(MUTE_KEY) === 'true',
 
   // Play a soft chime on unmute to confirm audio is restored (user decision)
   // Reuses startSound as the chime — short and appropriate
-  playUnmuteChime: () => startSound.play(),
+  playUnmuteChime: () => {
+    void getHowler().then(({ startSound }) => startSound.play());
+  },
 };
