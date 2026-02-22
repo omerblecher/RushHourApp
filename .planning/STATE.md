@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 5 of 5 (Sound and Polish) — IN PROGRESS
-Plan: 2 of 5 in current phase — Plan 05-02 complete
-Status: Phase 05 audio triggers wired; win celebration (confetti + glow + WinModal delay) implemented; GameHeader integrated; ready for 05-03
-Last activity: 2026-02-22 -- Plan 05-02 executed (slide/win/start sounds, confetti, board glow, GameHeader in GameScreen, ControlBar mute removed)
+Plan: 3 of 5 in current phase — Plan 05-03 complete
+Status: Phase 05 keyboard navigation and ARIA accessibility implemented; Tab/Arrow/Escape navigation wired; gold focus ring + screen reader labels added; ready for 05-04
+Last activity: 2026-02-22 -- Plan 05-03 executed (keyboard navigation, ARIA grid/gridcell roles, focused vehicle ring, REQ-016 + NFR-005 satisfied)
 
-Progress: [██████████] 79% (15/19 plans complete)
+Progress: [██████████] 84% (16/19 plans complete)
 
 ## Performance Metrics
 
@@ -36,11 +36,11 @@ Progress: [██████████] 79% (15/19 plans complete)
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 05-sound-and-polish | 2/5 | 37 min | 18 min |
+| 05-sound-and-polish | 3/5 | 45 min | 15 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-04 (3 min), 04-05 (3 min), 05-01 (27 min), 05-02 (10 min)
-- Trend: Phase 05 sound+assets stabilizing; 05-02 faster than 05-01 (no dependency installs needed)
+- Last 5 plans: 04-05 (3 min), 05-01 (27 min), 05-02 (10 min), 05-03 (8 min)
+- Trend: Phase 05 stabilizing fast; 05-03 clean execution (TypeScript compiled first pass, no deviations)
 
 *Updated after each plan completion*
 
@@ -100,6 +100,10 @@ Recent decisions affecting current work:
 - [Phase 05-02]: Win sequence uses setTimeout(2000) with useEffect cleanup to prevent memory leak if user navigates during animation
 - [Phase 05-02]: Board input locked via pointer-events:none on both boardWrapper and vehicleLayer during win animation (belt-and-suspenders)
 - [Phase 05-02]: ControlBar mute button removed; GameHeader is single mute control surface
+- [Phase 05-03]: selectedVehicleId state lives in Board; Board orchestrates keyboard moves, Vehicle is display-only
+- [Phase 05-03]: focusedShadow applied as inline style to override inline shadowStyle (inline wins over CSS class)
+- [Phase 05-03]: Invalid-axis arrow key presses silently ignored — no beep, no feedback, early return
+- [Phase 05-03]: onFocus on Vehicle auto-selects via Tab, enabling immediate arrow-key moves without extra click
 
 ### Pending Todos
 
@@ -113,5 +117,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 05-02-PLAN.md (audio triggers, win celebration, GameHeader integration, ControlBar cleanup)
-Resume file: .planning/phases/05-sound-and-polish/05-02-SUMMARY.md
+Stopped at: Completed 05-03-PLAN.md (keyboard navigation, ARIA accessibility, REQ-016 + NFR-005)
+Resume file: .planning/phases/05-sound-and-polish/05-03-SUMMARY.md

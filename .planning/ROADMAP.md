@@ -106,7 +106,7 @@ Plans:
 Plans:
 - [x] 05-01-PLAN.md — Install deps, soundService singleton, source sound files, GameHeader + HelpModal + AboutModal
 - [x] 05-02-PLAN.md — Wire slide/win/start sounds, win celebration sequence, GameHeader integration, remove mute from ControlBar
-- [ ] 05-03-PLAN.md — Keyboard navigation (Tab/Arrow/Escape), Vehicle ARIA + tabIndex + focus ring
+- [x] 05-03-PLAN.md — Keyboard navigation (Tab/Arrow/Escape), Vehicle ARIA + tabIndex + focus ring
 - [ ] 05-04-PLAN.md — Bundle size measurement + human verification of all Phase 5 features
 
 ## Requirement Coverage
@@ -185,4 +185,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Board UI and Drag Interaction | 3/3 | Complete | 2026-02-19 |
 | 3. Puzzle Data and Navigation | 4/4 | Complete | 2026-02-20 |
 | 4. Firebase Integration | 1/6 | In Progress | - |
-| 5. Sound and Polish | 2/4 | In Progress | - |
+| 5. Sound and Polish | 3/4 | In Progress | - |

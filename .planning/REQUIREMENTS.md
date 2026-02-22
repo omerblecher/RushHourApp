@@ -159,14 +159,14 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | REQ-013 | Phase 2 | Pending |
 | REQ-014 | Phase 2 | Pending |
 | REQ-015 | Phase 2 | Pending |
-| REQ-016 | Phase 5 | Pending |
+| REQ-016 | Phase 5 | Complete — Tab/Arrow/Escape keyboard navigation with gold focus ring in Board + Vehicle |
 | REQ-017 | Phase 2 | Pending |
 | REQ-018 | Phase 2 | Pending |
 | REQ-019 | Phase 2 | Pending |
 | REQ-020 | Phase 2 | Pending |
 | REQ-021 | Phase 2 | Pending |
 | REQ-022 | Phase 2 | Pending |
-| REQ-023 | Phase 5 | Pending |
+| REQ-023 | Phase 5 | Complete |
 | REQ-024 | Phase 2 | Pending |
 | REQ-025 | Phase 3 | Complete |
 | REQ-026 | Phase 3 | Complete |
@@ -201,7 +201,7 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | NFR-002 | Phase 5 | Complete |
 | NFR-003 | Phase 5 | Complete |
 | NFR-004 | Phase 1 | Pending |
-| NFR-005 | Phase 5 | Pending |
+| NFR-005 | Phase 5 | Complete — role=grid on board, role=gridcell + aria-label + aria-selected on each Vehicle |
 | NFR-006 | Phase 4 | Complete |
 | NFR-007 | Phase 5 | Pending |
 | NFR-008 | Phase 2 | Pending |
