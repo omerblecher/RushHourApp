@@ -203,5 +203,5 @@ Hints/solver for players, offline PWA mode, native mobile app, monetization.
 | NFR-004 | Phase 1 | Pending |
 | NFR-005 | Phase 5 | Complete — role=grid on board, role=gridcell + aria-label + aria-selected on each Vehicle |
 | NFR-006 | Phase 4 | Complete |
-| NFR-007 | Phase 5 | Pending |
+| NFR-007 | Phase 5 | Complete |
 | NFR-008 | Phase 2 | Pending |

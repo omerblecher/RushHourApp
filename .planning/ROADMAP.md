@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Board UI and Drag Interaction** - Visual game board with CSS-styled vehicles and pointer-event-driven drag system
 - [x] **Phase 3: Puzzle Data and Navigation** - 80+ puzzle definitions, difficulty-grouped selection UI, routing, and localStorage progress tracking (completed 2026-02-20)
 - [ ] **Phase 4: Firebase Integration** - Google authentication, anonymous auth, Firestore leaderboards with security rules
-- [ ] **Phase 5: Sound and Polish** - Howler.js sound effects, win animations, keyboard accessibility, and cross-browser verification
+- [x] **Phase 5: Sound and Polish** - Howler.js sound effects, win animations, keyboard accessibility, and cross-browser verification (completed 2026-02-22)
 
 ## Phase Details
 
@@ -130,7 +130,7 @@ All 61 v1 requirements mapped. No orphans.
 | REQ-013 | 2 | Drag and Touch Interaction |
 | REQ-014 | 2 | Drag and Touch Interaction |
 | REQ-015 | 2 | Drag and Touch Interaction |
-| REQ-016 | 5 | 1/4 | In Progress|  | 2 | Drag and Touch Interaction |
+| REQ-016 | 5 | 4/4 | Complete   | 2026-02-22 | 2 | Drag and Touch Interaction |
 | REQ-018 | 2 | Visual Design |
 | REQ-019 | 2 | Visual Design |
 | REQ-020 | 2 | Visual Design |

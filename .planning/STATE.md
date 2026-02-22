@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** A fun, polished Rush Hour sliding puzzle game where players drag vehicles on a 6x6 grid to free the red car, competing on global leaderboards
-**Current focus:** Phase 5 in progress — audio triggers and win celebration sequence complete
+**Current focus:** Phase 5 COMPLETE — all 4 plans executed, NFR-002/003/007 satisfied, v1.0 milestone ready
 
 ## Current Position
 
-Phase: 5 of 5 (Sound and Polish) — IN PROGRESS
-Plan: 3 of 5 in current phase — Plan 05-03 complete
-Status: Phase 05 keyboard navigation and ARIA accessibility implemented; Tab/Arrow/Escape navigation wired; gold focus ring + screen reader labels added; ready for 05-04
-Last activity: 2026-02-22 -- Plan 05-03 executed (keyboard navigation, ARIA grid/gridcell roles, focused vehicle ring, REQ-016 + NFR-005 satisfied)
+Phase: 5 of 5 (Sound and Polish) — COMPLETE
+Plan: 4 of 4 in current phase — Plan 05-04 complete (Phase 5 done)
+Status: Phase 05 complete; bundle 192.67 KB gzip (NFR-002 met); offline verified (NFR-003); cross-browser verified Chrome/Firefox/Safari/Edge (NFR-007); all Phase 5 features working
+Last activity: 2026-02-22 -- Plan 05-04 executed (bundle size fix via dynamic imports, human verification approved)
 
-Progress: [██████████] 84% (16/19 plans complete)
+Progress: [██████████] 100% (19/19 plans complete)
 
 ## Performance Metrics
 
@@ -36,11 +36,11 @@ Progress: [██████████] 84% (16/19 plans complete)
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 05-sound-and-polish | 3/5 | 45 min | 15 min |
+| 05-sound-and-polish | 4/4 | 60 min | 15 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-05 (3 min), 05-01 (27 min), 05-02 (10 min), 05-03 (8 min)
-- Trend: Phase 05 stabilizing fast; 05-03 clean execution (TypeScript compiled first pass, no deviations)
+- Last 5 plans: 05-01 (27 min), 05-02 (10 min), 05-03 (8 min), 05-04 (15 min)
+- Trend: Phase 05 complete; all plans executed cleanly; v1.0 milestone achieved
 
 *Updated after each plan completion*
 
@@ -104,6 +104,7 @@ Recent decisions affecting current work:
 - [Phase 05-03]: focusedShadow applied as inline style to override inline shadowStyle (inline wins over CSS class)
 - [Phase 05-03]: Invalid-axis arrow key presses silently ignored — no beep, no feedback, early return
 - [Phase 05-03]: onFocus on Vehicle auto-selects via Tab, enabling immediate arrow-key moves without extra click
+- [Phase 05-04]: Dynamic import() for canvas-confetti and lazy Howl init in soundService defers 14 KB gzip from initial load, bringing bundle to 192.67 KB (under NFR-002 200 KB target)
 
 ### Pending Todos
 
@@ -117,5 +118,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 05-03-PLAN.md (keyboard navigation, ARIA accessibility, REQ-016 + NFR-005)
-Resume file: .planning/phases/05-sound-and-polish/05-03-SUMMARY.md
+Stopped at: Completed 05-04-PLAN.md (bundle size fix, NFR-002 satisfied, Phase 5 complete — v1.0 milestone done)
+Resume file: .planning/phases/05-sound-and-polish/05-04-SUMMARY.md
