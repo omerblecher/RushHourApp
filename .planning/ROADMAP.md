@@ -101,11 +101,13 @@ Plans:
   3. Win celebration animation plays on puzzle completion
   4. User can select a vehicle and move it with arrow keys as a keyboard alternative
   5. Game works correctly on Chrome, Firefox, Safari, and Edge (latest 2 versions) and degrades gracefully when Firebase is unavailable
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md — Install deps, soundService singleton, source sound files, GameHeader + HelpModal + AboutModal
+- [ ] 05-02-PLAN.md — Wire slide/win/start sounds, win celebration sequence, GameHeader integration, remove mute from ControlBar
+- [ ] 05-03-PLAN.md — Keyboard navigation (Tab/Arrow/Escape), Vehicle ARIA + tabIndex + focus ring
+- [ ] 05-04-PLAN.md — Bundle size measurement + human verification of all Phase 5 features
 
 ## Requirement Coverage
 
@@ -184,4 +186,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Board UI and Drag Interaction | 3/3 | Complete | 2026-02-19 |
 | 3. Puzzle Data and Navigation | 4/4 | Complete | 2026-02-20 |
 | 4. Firebase Integration | 1/6 | In Progress | - |
-| 5. Sound and Polish | 0/? | Not started | - |
+| 5. Sound and Polish | 0/4 | Not started | - |
