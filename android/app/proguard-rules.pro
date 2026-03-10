@@ -19,3 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# @capacitor-firebase/authentication bundles Facebook/Twitter/etc handlers
+# even when those providers are not used. Suppress missing-class errors for
+# SDKs we have not included.
+-dontwarn com.facebook.**
+-dontwarn twitter4j.**
+-dontwarn com.twitter.**
+-dontwarn io.capawesome.capacitorjs.plugins.firebase.authentication.handlers.FacebookAuthProviderHandler
+-dontwarn io.capawesome.capacitorjs.plugins.firebase.authentication.handlers.TwitterAuthProviderHandler
