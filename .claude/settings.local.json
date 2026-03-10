@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git -C C:/code/Claude/RushHourApp log --oneline --all --grep=\"03-02\")",
+      "Bash(npx tsc:*)",
+      "Bash(git -C C:/code/Claude/RushHourApp status)",
+      "Bash(git -C C:/code/Claude/RushHourApp log --oneline -5)",
+      "Bash(git -C C:/code/Claude/RushHourApp add src/screens/MainMenuScreen/MainMenuScreen.tsx src/screens/MainMenuScreen/MainMenuScreen.module.css src/data/puzzles/ package-lock.json)",
+      "Bash(git -C:*)",
+      "Bash(npm run validate-puzzles:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebSearch",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(gzip:*)",
+      "Bash(npm run build:*)",
+      "Bash(# Check offline / Firebase degradation handling grep -n \"\"offline\\\\|unavailable\\\\|error\\\\|catch\\\\|fallback\"\" /c/code/Claude/RushHourApp/src/services/scoreService.ts)",
+      "Bash(# Final check - the sound files are SILENT MP3s \\(plan deviation noted in SUMMARY\\) # This is a notable issue: REQ-033 says \"\"Car slide sound on vehicle movement\"\" # If sounds are silent, they technically don''t play audible sounds # Let''s also verify the sound file actual structure file /c/code/Claude/RushHourApp/public/sounds/slide.mp3 || echo \"\"file command not available\"\" # Check if they''re actually valid MP3s by looking at first bytes xxd /c/code/Claude/RushHourApp/public/sounds/slide.mp3)",
+      "Bash(npm install:*)",
+      "Bash(cat package.json | python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('deps:', list\\(d.get\\('dependencies',{}\\).keys\\(\\)\\)\\); print\\('devdeps:', list\\(d.get\\('devDependencies',{}\\).keys\\(\\)\\)\\)\")",
+      "Bash(npx cap:*)",
+      "Bash(npx capacitor-assets:*)"
+    ]
+  }
+}

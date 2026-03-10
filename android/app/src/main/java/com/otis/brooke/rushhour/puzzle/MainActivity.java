@@ -1,4 +1,4 @@
-package com.rushhour.puzzle;
+package com.otis.brooke.rushhour.puzzle;
 
 import com.getcapacitor.BridgeActivity;
 

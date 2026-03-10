@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.rushhour.puzzle',
+  appId: 'com.otis.brooke.rushhour.puzzle',
   appName: 'Rush Hour',
   webDir: 'dist',
   plugins: {
