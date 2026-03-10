@@ -17,6 +17,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.2.0",
     "@types/canvas-confetti": "^1.9.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -27,6 +29,12 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
+    "@capacitor-firebase/authentication": "^8.1.0",
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.1",
     "canvas-confetti": "^1.9.4",
     "firebase": "^12.9.0",
     "react": "^19.2.4",

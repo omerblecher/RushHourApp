@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rush Hour</string>
+    <string name="title_activity_main">Rush Hour</string>
+    <string name="package_name">com.rushhour.puzzle</string>
+    <string name="custom_url_scheme">com.rushhour.puzzle</string>
+</resources>

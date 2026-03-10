@@ -4,15 +4,35 @@ import {
   signInWithPopup,
   signInAnonymously,
   linkWithPopup,
+  linkWithCredential,
   signInWithCredential,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
 } from 'firebase/auth';
 import type { User, AuthError } from 'firebase/auth';
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { auth } from '../firebase';
 import { mergeAnonymousScores } from '../services/scoreService';
 
 const googleProvider = new GoogleAuthProvider();
+
+async function nativeGoogleSignIn() {
+  const result = await FirebaseAuthentication.signInWithGoogle();
+  const credential = GoogleAuthProvider.credential(
+    result.credential?.idToken ?? null,
+    result.credential?.accessToken ?? null,
+  );
+  return signInWithCredential(auth, credential);
+}
+
+async function getNativeGoogleCredential() {
+  const result = await FirebaseAuthentication.signInWithGoogle();
+  return GoogleAuthProvider.credential(
+    result.credential?.idToken ?? null,
+    result.credential?.accessToken ?? null,
+  );
+}
 
 interface AuthStore {
   user: User | null;
@@ -37,7 +57,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   signInWithGoogle: async () => {
-    await signInWithPopup(auth, googleProvider);
+    if (Capacitor.isNativePlatform()) {
+      await nativeGoogleSignIn();
+    } else {
+      await signInWithPopup(auth, googleProvider);
+    }
     // onAuthStateChanged will update the store automatically
   },
 
@@ -53,8 +77,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ upgradeStatus: 'upgrading' });
 
     try {
-      // Happy path: link anonymous account to Google — UID is preserved
-      await linkWithPopup(currentUser, googleProvider);
+      if (Capacitor.isNativePlatform()) {
+        const credential = await getNativeGoogleCredential();
+        await linkWithCredential(currentUser, credential);
+      } else {
+        // Happy path: link anonymous account to Google — UID is preserved
+        await linkWithPopup(currentUser, googleProvider);
+      }
       // Scores were stored locally only for anon users; same UID, no cross-user transfer needed
       await mergeAnonymousScores(currentUser.uid, currentUser.uid);
       set({ upgradeStatus: 'success' });
@@ -64,7 +93,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
       if (
         error.code === 'auth/popup-closed-by-user' ||
-        error.code === 'auth/cancelled-popup-request'
+        error.code === 'auth/cancelled-popup-request' ||
+        error.code === 'auth/cancelled'
       ) {
         set({ upgradeStatus: 'idle' });
         return 'cancelled';
