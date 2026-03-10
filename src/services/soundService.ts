@@ -1,52 +1,70 @@
 const MUTE_KEY = 'rushhour_muted';
+let ctx: AudioContext | null = null;
 
-// Howler instances are created lazily on first use to avoid adding
-// howler to the initial JS bundle (saves ~10 KB gzip on initial load).
-let slideSound: import('howler').Howl | null = null;
-let winSound: import('howler').Howl | null = null;
-let startSound: import('howler').Howl | null = null;
+function getCtx(): AudioContext {
+  if (!ctx) ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+  return ctx;
+}
 
-async function getHowler() {
-  const { Howl, Howler } = await import('howler');
+async function ensureRunning(): Promise<AudioContext> {
+  const c = getCtx();
+  if (c.state === 'suspended') await c.resume();
+  return c;
+}
 
-  if (!slideSound) {
-    slideSound = new Howl({ src: ['/sounds/slide.mp3'], volume: 0.6, preload: true });
-  }
-  if (!winSound) {
-    winSound = new Howl({ src: ['/sounds/win.mp3'], volume: 0.8, preload: true });
-  }
-  if (!startSound) {
-    startSound = new Howl({ src: ['/sounds/level-start.mp3'], volume: 0.7, preload: true });
-  }
+function playTone(c: AudioContext, freq: number, startTime: number, duration: number, gainPeak = 0.4) {
+  const osc = c.createOscillator();
+  const gain = c.createGain();
+  osc.connect(gain);
+  gain.connect(c.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, startTime);
+  gain.gain.setValueAtTime(0, startTime);
+  gain.gain.linearRampToValueAtTime(gainPeak, startTime + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+  osc.start(startTime);
+  osc.stop(startTime + duration + 0.01);
+}
 
-  // Apply persisted mute state each time we (re)initialize Howler
-  const savedMuted = localStorage.getItem(MUTE_KEY) === 'true';
-  Howler.mute(savedMuted);
+async function playSlideSound() {
+  const c = await ensureRunning();
+  const now = c.currentTime;
+  const osc = c.createOscillator();
+  const gain = c.createGain();
+  osc.connect(gain);
+  gain.connect(c.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(350, now);
+  osc.frequency.exponentialRampToValueAtTime(120, now + 0.13);
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.4, now + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+  osc.start(now);
+  osc.stop(now + 0.14);
+}
 
-  return { Howl, Howler, slideSound: slideSound!, winSound: winSound!, startSound: startSound! };
+async function playWinSound() {
+  const c = await ensureRunning();
+  const now = c.currentTime;
+  const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+  const noteDuration = 0.14;
+  notes.forEach((freq, i) => {
+    playTone(c, freq, now + i * noteDuration, noteDuration, 0.35);
+  });
+}
+
+async function playStartSound() {
+  const c = await ensureRunning();
+  const now = c.currentTime;
+  playTone(c, 392, now, 0.2, 0.3);       // G4
+  playTone(c, 523, now + 0.2, 0.2, 0.3); // C5
 }
 
 export const soundService = {
-  playSlide: () => {
-    void getHowler().then(({ slideSound }) => slideSound.play());
-  },
-  playWin: () => {
-    void getHowler().then(({ winSound }) => winSound.play());
-  },
-  playStart: () => {
-    void getHowler().then(({ startSound }) => startSound.play());
-  },
-
-  setMuted: (muted: boolean) => {
-    localStorage.setItem(MUTE_KEY, String(muted));
-    void import('howler').then(({ Howler }) => Howler.mute(muted));
-  },
-
-  isMuted: (): boolean => localStorage.getItem(MUTE_KEY) === 'true',
-
-  // Play a soft chime on unmute to confirm audio is restored (user decision)
-  // Reuses startSound as the chime — short and appropriate
-  playUnmuteChime: () => {
-    void getHowler().then(({ startSound }) => startSound.play());
-  },
+  playSlide: () => { if (!soundService.isMuted()) void playSlideSound(); },
+  playWin:   () => { if (!soundService.isMuted()) void playWinSound(); },
+  playStart: () => { if (!soundService.isMuted()) void playStartSound(); },
+  playUnmuteChime: () => void playStartSound(),
+  setMuted: (muted: boolean) => { localStorage.setItem(MUTE_KEY, String(muted)); },
+  isMuted:  (): boolean => localStorage.getItem(MUTE_KEY) === 'true',
 };
