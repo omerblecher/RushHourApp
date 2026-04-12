@@ -69,8 +69,28 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 to SETUP-05 | Phase 6 | Pending |
-| GDPR-01 to GDPR-05 | Phase 7 | Pending |
-| BANNER-01 to BANNER-05 | Phase 8 | Pending |
-| INTER-01 to INTER-05 | Phase 9 | Pending |
-| RELEASE-01 to RELEASE-05 | Phase 10 | Pending |
+| SETUP-01 | Phase 6 | Pending |
+| SETUP-02 | Phase 6 | Pending |
+| SETUP-03 | Phase 6 | Pending |
+| SETUP-04 | Phase 6 | Pending |
+| SETUP-05 | Phase 6 | Pending |
+| GDPR-01 | Phase 7 | Pending |
+| GDPR-02 | Phase 7 | Pending |
+| GDPR-03 | Phase 7 | Pending |
+| GDPR-04 | Phase 7 | Pending |
+| GDPR-05 | Phase 7 | Pending |
+| BANNER-01 | Phase 8 | Pending |
+| BANNER-02 | Phase 8 | Pending |
+| BANNER-03 | Phase 8 | Pending |
+| BANNER-04 | Phase 8 | Pending |
+| BANNER-05 | Phase 8 | Pending |
+| INTER-01 | Phase 9 | Pending |
+| INTER-02 | Phase 9 | Pending |
+| INTER-03 | Phase 9 | Pending |
+| INTER-04 | Phase 9 | Pending |
+| INTER-05 | Phase 9 | Pending |
+| RELEASE-01 | Phase 10 | Pending |
+| RELEASE-02 | Phase 10 | Pending |
+| RELEASE-03 | Phase 10 | Pending |
+| RELEASE-04 | Phase 10 | Pending |
+| RELEASE-05 | Phase 10 | Pending |
