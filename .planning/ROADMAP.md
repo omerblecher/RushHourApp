@@ -42,7 +42,9 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   3. Gradle build succeeds with `playServicesAdsVersion = '24.3.0'` pinned — no Firebase/AdMob manifest merge conflict
   4. `AD_ID` permission appears in compiled APK manifest (verified via manifest dump or build output)
   5. Dev builds use Google test App ID and test ad unit IDs; environment variable gate is in place for production IDs
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 06-01-PLAN.md — Install AdMob plugin, pin gradle version, update manifest/strings, create env files
+- [ ] 06-02-PLAN.md — Manual Android Studio build + device launch + adb AD_ID verification (checkpoint)
 
 ### Phase 7: GDPR Consent
 **Goal**: Users receive the UMP consent dialog when required, and no ad is loaded or displayed until consent is fully resolved
@@ -102,7 +104,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 | 3. Puzzle Data & Nav | v1.0 | 4/4 | Complete | 2026-02-20 |
 | 4. Firebase Integration | v1.0 | 6/6 | Complete | 2026-02-22 |
 | 5. Sound and Polish | v1.0 | 4/4 | Complete | 2026-02-22 |
-| 6. Android Native Setup | v1.1 | 0/TBD | Not started | - |
+| 6. Android Native Setup | v1.1 | 0/2 | Not started | - |
 | 7. GDPR Consent | v1.1 | 0/TBD | Not started | - |
 | 8. Banner Ad | v1.1 | 0/TBD | Not started | - |
 | 9. Interstitial Ad | v1.1 | 0/TBD | Not started | - |
