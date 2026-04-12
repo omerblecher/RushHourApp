@@ -1,788 +1,443 @@
-# Architecture Patterns
+# Architecture: AdMob Integration into Existing Rush Hour App
 
-**Domain:** React-based Rush Hour Sliding Puzzle Game with Firebase Backend
-**Researched:** 2026-02-16
-**Overall Confidence:** MEDIUM (based on training data; web verification unavailable)
-
----
-
-## Recommended Architecture
-
-### High-Level Overview
-
-```
-+--------------------------------------------------+
-|                   React SPA                       |
-|                                                   |
-|  +------------+  +----------+  +--------------+   |
-|  | Game Engine |  | UI Shell |  | Firebase SDK |   |
-|  | (pure logic)|  | (React)  |  | (auth, db)   |   |
-|  +------+-----+  +----+-----+  +------+-------+   |
-|         |              |               |           |
-|         +------+-------+-------+-------+           |
-|                |               |                   |
-|         React Context    Firestore Hooks           |
-|         (game state)     (async data)              |
-+--------------------------------------------------+
-                         |
-              +----------+----------+
-              |     Firebase        |
-              |  +------+ +------+ |
-              |  | Auth | | Fire | |
-              |  |      | |store | |
-              |  +------+ +------+ |
-              +---------------------+
-```
-
-**Key principle:** Separate pure game logic from React rendering and from Firebase I/O. The game engine is a plain TypeScript module with zero dependencies on React or Firebase. React components consume it. Firebase hooks handle persistence. This separation makes testing trivial and keeps the codebase navigable.
+**Milestone:** v1.1 Ad Monetization
+**Researched:** 2026-04-12
+**Confidence:** HIGH — plugin API stable at v8.0.0, matches Capacitor 8; UMP behavior verified against Google docs
 
 ---
 
-## Component Architecture
+## Overview
 
-### Component Tree
-
-```
-App
-+-- AuthProvider (context)
-|   +-- GameStateProvider (context)
-|       +-- Layout
-|           +-- Header
-|           |   +-- Logo
-|           |   +-- UserMenu (login/logout/avatar)
-|           |   +-- SoundToggle
-|           |
-|           +-- Routes
-|               +-- HomePage
-|               |   +-- DifficultySelector
-|               |   +-- PuzzleGrid (thumbnail cards)
-|               |       +-- PuzzleCard (per puzzle)
-|               |
-|               +-- GamePage
-|               |   +-- GameBoard
-|               |   |   +-- Grid (6x6 background)
-|               |   |   +-- Vehicle (one per car/truck, draggable)
-|               |   |   +-- ExitMarker
-|               |   +-- GameHUD
-|               |   |   +-- MoveCounter
-|               |   |   +-- Timer
-|               |   |   +-- ResetButton
-|               |   |   +-- BackButton
-|               |   +-- WinModal
-|               |       +-- ScoreSummary
-|               |       +-- NextPuzzleButton
-|               |
-|               +-- LeaderboardPage
-|                   +-- PuzzleFilter (difficulty, puzzle ID)
-|                   +-- LeaderboardTable
-|                       +-- LeaderboardRow
-```
-
-### Component Boundaries
-
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| **AuthProvider** | Wraps Firebase Auth, exposes user object and login/logout actions via context | Firebase Auth SDK |
-| **GameStateProvider** | Holds current puzzle state, move history, timer. Exposes dispatch actions. | Game engine (pure logic), AuthProvider (for user ID) |
-| **GameBoard** | Renders the 6x6 grid and all vehicles. Handles drag/touch input. | GameStateProvider (reads state, dispatches moves) |
-| **Vehicle** | Renders a single car or truck as CSS/SVG. Handles its own drag interaction. | GameBoard (receives position props, reports drag-end) |
-| **Grid** | Renders the 6x6 background grid lines and exit marker. Pure presentational. | None (props only) |
-| **PuzzleCard** | Thumbnail of a puzzle with difficulty badge and best-score indicator. | Router (navigates to game), Firestore (reads user best score) |
-| **LeaderboardTable** | Fetches and displays top scores for a given puzzle. | Firestore (reads leaderboard collection) |
-| **WinModal** | Shown on puzzle completion. Displays score, submits to leaderboard. | GameStateProvider, Firestore (writes score) |
-| **SoundToggle** | Global mute/unmute. Persists preference to localStorage. | SoundManager (utility module) |
+`@capacitor-community/admob` v8.0.0 slots cleanly into the existing service-singleton architecture. All AdMob calls are fully imperative — the plugin renders native Android views positioned by the SDK, not by React. There is no "AdMob React component". This mirrors how `soundService.ts` works today: pure TS functions, no hooks, no JSX.
 
 ---
 
-## State Management Architecture
+## New Files to Create
 
-### Three State Domains
+### `src/services/adService.ts`
 
-Do NOT put all state in one store. Use the right tool for each domain:
+A singleton matching the pattern of `soundService.ts`. Owns all AdMob state: initialization flag, interstitial-ready flag, and the full preload/show lifecycle.
 
-| Domain | Tool | Why |
-|--------|------|-----|
-| **Game State** (board positions, moves, timer, win condition) | `useReducer` + Context | Complex state transitions with clear actions. Reducer is testable in isolation. |
-| **Auth State** (current user, login status) | Context wrapping Firebase `onAuthStateChanged` | Firebase manages the actual state; React just subscribes. |
-| **Server Data** (leaderboards, puzzle catalog metadata) | Direct Firestore hooks or a thin custom hook layer | Read-heavy, cache-friendly. No need for global store. |
-| **UI State** (modal open, sound on, selected difficulty) | Local component state or `useState` | Ephemeral, no cross-component sharing needed. |
+**Responsibilities:**
+- Call `AdMob.initialize()` once at app startup
+- Run the UMP consent flow (`requestConsentInfo` → `showConsentForm` when required for EEA/UK)
+- Expose `showBanner()` / `removeBanner()` for imperative call from `GameScreen`
+- Expose `preloadInterstitial()` to load the next ad in background
+- Expose `showInterstitialIfReady()` for the win flow — returns a `Promise<void>` that resolves when the ad closes (or immediately if no ad is loaded)
+- Self-reload after each interstitial dismissal via event listener
 
-**Why not Redux/Zustand:** The game state is contained within a single page (GamePage). A reducer + context is sufficient. Adding a state management library would be over-engineering for this scope. If the project grows significantly (multiplayer, puzzle editor), reconsider.
+**Why a singleton and not a Zustand store or hook:**
+- Ad state is not UI state — no component needs to re-render when "interstitial becomes ready"
+- The preload lifecycle must outlive any single component mount/unmount cycle
+- Exactly matches the `soundService` precedent and the Capacitor pattern of imperative bridge calls
 
-### Game State Reducer
+**Implementation skeleton (for the build phase to flesh out):**
 
 ```typescript
-// types/game.ts
+// src/services/adService.ts
+import { Capacitor } from '@capacitor/core';
+import {
+  AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition,
+  AdOptions, InterstitialAdPluginEvents, AdmobConsentStatus,
+} from '@capacitor-community/admob';
 
-interface Position {
-  row: number;  // 0-5
-  col: number;  // 0-5
-}
+// Replace with real IDs before production build
+const BANNER_AD_ID      = 'ca-app-pub-3940256099942544/6300978111'; // test ID
+const INTERSTITIAL_AD_ID = 'ca-app-pub-3940256099942544/1033173712'; // test ID
 
-interface VehicleState {
-  id: string;
-  type: 'car' | 'truck';        // car = 2 cells, truck = 3 cells
-  orientation: 'horizontal' | 'vertical';
-  position: Position;            // top-left cell of the vehicle
-  color: string;
-  isTarget: boolean;             // true for the red car
-}
+let initialized        = false;
+let interstitialReady  = false;
 
-interface GameState {
-  puzzleId: string;
-  vehicles: VehicleState[];
-  moveCount: number;
-  moveHistory: Move[];           // for undo support
-  startTime: number | null;      // Date.now() when first move made
-  elapsedMs: number;
-  status: 'idle' | 'playing' | 'won';
-  gridSize: 6;                   // constant, but explicit
-}
+async function initialize(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  if (initialized) return;
+  initialized = true;
 
-type GameAction =
-  | { type: 'LOAD_PUZZLE'; puzzle: PuzzleDefinition }
-  | { type: 'MOVE_VEHICLE'; vehicleId: string; newPosition: Position }
-  | { type: 'UNDO' }
-  | { type: 'RESET' }
-  | { type: 'TICK'; now: number }
-  | { type: 'WIN' };
-
-interface Move {
-  vehicleId: string;
-  from: Position;
-  to: Position;
-}
-```
-
-```typescript
-// engine/gameReducer.ts  (PURE -- no React imports)
-
-function gameReducer(state: GameState, action: GameAction): GameState {
-  switch (action.type) {
-    case 'LOAD_PUZZLE':
-      return initializeFromPuzzle(action.puzzle);
-    case 'MOVE_VEHICLE':
-      return applyMove(state, action.vehicleId, action.newPosition);
-    case 'UNDO':
-      return undoLastMove(state);
-    case 'RESET':
-      return resetToInitial(state);
-    case 'TICK':
-      return { ...state, elapsedMs: action.now - (state.startTime ?? action.now) };
-    case 'WIN':
-      return { ...state, status: 'won' };
-    default:
-      return state;
+  try {
+    await AdMob.initialize({ initializeForTesting: false });
+    await runConsentFlow();
+    void preloadInterstitial();
+  } catch (err) {
+    console.warn('[adService] initialization failed, ads disabled', err);
+    initialized = false; // allow retry on next launch
   }
 }
-```
 
-**Key design choice:** The reducer is a pure function in a plain `.ts` file (not a React hook). It can be unit tested with zero React dependencies. The `GameStateProvider` wraps it with `useReducer`.
-
-### Move Validation (Game Engine)
-
-```typescript
-// engine/moveValidator.ts
-
-/**
- * Given the current board state, returns valid positions
- * a vehicle can move to. Vehicles can only slide along
- * their orientation axis. They cannot pass through other vehicles.
- */
-function getValidMoves(state: GameState, vehicleId: string): Position[] {
-  // 1. Find the vehicle
-  // 2. Determine slide axis (row for horizontal, col for vertical)
-  // 3. Scan forward and backward along axis for empty cells
-  // 4. Return all reachable positions
-}
-
-/**
- * Check if the target (red) car has reached column 4
- * (its front is at col 5, aligned with exit on row 2).
- */
-function checkWinCondition(state: GameState): boolean {
-  const target = state.vehicles.find(v => v.isTarget);
-  // Target car is horizontal on row 2
-  // Win when target.position.col === 4 (car occupies cols 4-5, front at exit)
-  return target !== undefined && target.position.col === 4;
-}
-```
-
-### Win Detection Flow
-
-```
-User drags vehicle -> MOVE_VEHICLE dispatched
-  -> gameReducer applies move
-  -> GameStateProvider effect checks checkWinCondition()
-  -> If won: dispatch WIN, play sound, show WinModal
-  -> WinModal submits score to Firestore
-```
-
----
-
-## Firebase Data Model
-
-### Firestore Collections
-
-```
-firestore-root/
-|
-+-- puzzles/                          # Collection: puzzle definitions
-|   +-- {puzzleId}/                   # Document: "beginner-01", "expert-15"
-|       +-- difficulty: string        # "beginner" | "intermediate" | "advanced" | "expert"
-|       +-- number: number            # Puzzle number within difficulty (1-20+)
-|       +-- minMoves: number          # Optimal solution move count (for star rating)
-|       +-- vehicles: [               # Array of initial vehicle positions
-|       |     {
-|       |       id: string,
-|       |       type: "car" | "truck",
-|       |       orientation: "horizontal" | "vertical",
-|       |       row: number,
-|       |       col: number,
-|       |       color: string,
-|       |       isTarget: boolean
-|       |     }
-|       |   ]
-|       +-- createdAt: timestamp
-|
-+-- leaderboard/                      # Collection: per-puzzle leaderboard entries
-|   +-- {entryId}/                    # Auto-generated document ID
-|       +-- puzzleId: string          # Reference to puzzle
-|       +-- difficulty: string        # Denormalized for filtering
-|       +-- userId: string            # Firebase Auth UID
-|       +-- displayName: string       # Denormalized (avoid extra reads)
-|       +-- moves: number             # Move count achieved
-|       +-- timeMs: number            # Time in milliseconds
-|       +-- score: number             # Computed score (lower = better)
-|       +-- submittedAt: timestamp    # Server timestamp
-|
-+-- userProfiles/                     # Collection: user data
-    +-- {userId}/                     # Document ID = Firebase Auth UID
-        +-- displayName: string
-        +-- createdAt: timestamp
-        +-- puzzleProgress: {         # Map: tracks completion per puzzle
-        |     "beginner-01": {
-        |       bestMoves: number,
-        |       bestTimeMs: number,
-        |       bestScore: number,
-        |       completedAt: timestamp
-        |     },
-        |     ...
-        |   }
-        +-- stats: {                  # Aggregated stats
-              totalPuzzlesSolved: number,
-              totalMoves: number
-            }
-```
-
-### Design Decisions
-
-**Puzzles: Firestore collection vs. static JSON files?**
-
-Use **static JSON files bundled in the app** for puzzle definitions, with a Firestore `puzzles` collection as an optional mirror.
-
-Rationale:
-- Puzzles are static data that never changes at runtime.
-- Bundling as JSON avoids Firestore reads on every game load (saves reads quota and latency).
-- 80 puzzles at ~500 bytes each = ~40KB total. Trivial bundle size.
-- Firestore collection is useful only if you want to add puzzles without redeploying. For v1, static JSON is simpler.
-
-```typescript
-// data/puzzles/beginner.json
-[
-  {
-    "id": "beginner-01",
-    "difficulty": "beginner",
-    "number": 1,
-    "minMoves": 8,
-    "vehicles": [
-      { "id": "X", "type": "car", "orientation": "horizontal", "row": 2, "col": 0, "color": "#E74C3C", "isTarget": true },
-      { "id": "A", "type": "truck", "orientation": "vertical", "row": 0, "col": 2, "color": "#3498DB", "isTarget": false },
-      ...
-    ]
-  },
-  ...
-]
-```
-
-**Leaderboard: flat collection vs. subcollection per puzzle?**
-
-Use a **flat `leaderboard` collection** with composite indexes on `(puzzleId, score)`.
-
-Rationale:
-- Subcollections (`puzzles/{id}/leaderboard`) make cross-puzzle queries (e.g., "show me a player's global rank") impossible in Firestore.
-- A flat collection with `puzzleId` field supports both per-puzzle queries AND cross-puzzle queries.
-- Composite index on `puzzleId + score` (ascending) makes "top 10 for puzzle X" a single indexed query.
-- Keep documents small: denormalize `displayName` and `difficulty` to avoid joins.
-
-**User progress: subcollection vs. map field?**
-
-Use a **map field within the user document** (`puzzleProgress`).
-
-Rationale:
-- 80 puzzles max means the map will have at most 80 keys. Well within Firestore's 1MB document limit.
-- Single document read to get all progress (vs. 80 subcollection reads).
-- Atomic updates via dot notation: `userProfiles/{uid}.puzzleProgress.beginner-01.bestMoves`.
-
-**Score computation:**
-
-```typescript
-// Lower score = better
-// Weight moves more heavily than time to reward efficiency
-function computeScore(moves: number, timeMs: number): number {
-  const timeSeconds = Math.floor(timeMs / 1000);
-  return (moves * 1000) + timeSeconds;
-}
-```
-
-This gives move count ~1000x weight over seconds. A player with 12 moves in 120s (score: 12120) beats a player with 13 moves in 5s (score: 13005). Moves matter most; time is the tiebreaker.
-
----
-
-## Firestore Security Rules
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    // --- Puzzles: read-only for everyone ---
-    match /puzzles/{puzzleId} {
-      allow read: if true;
-      allow write: if false;  // Admin-only via Firebase Admin SDK
-    }
-
-    // --- Leaderboard: authenticated users can create, nobody can update/delete ---
-    match /leaderboard/{entryId} {
-      allow read: if true;
-
-      allow create: if
-        // Must be authenticated
-        request.auth != null
-        // userId must match the authenticated user
-        && request.resource.data.userId == request.auth.uid
-        // Required fields must exist
-        && request.resource.data.keys().hasAll([
-          'puzzleId', 'difficulty', 'userId', 'displayName',
-          'moves', 'timeMs', 'score', 'submittedAt'
-        ])
-        // Moves must be a positive integer
-        && request.resource.data.moves is int
-        && request.resource.data.moves > 0
-        && request.resource.data.moves < 1000
-        // Time must be positive
-        && request.resource.data.timeMs is int
-        && request.resource.data.timeMs > 0
-        // Score must match the formula (server-side validation)
-        && request.resource.data.score ==
-           (request.resource.data.moves * 1000) +
-           (request.resource.data.timeMs / 1000)
-        // Timestamp must be server timestamp
-        && request.resource.data.submittedAt == request.time;
-
-      // No updates or deletes -- leaderboard entries are immutable
-      allow update, delete: if false;
-    }
-
-    // --- User Profiles: owner can read/write their own ---
-    match /userProfiles/{userId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && request.auth.uid == userId
-        // Prevent users from setting arbitrary fields
-        && request.resource.data.keys().hasOnly([
-          'displayName', 'createdAt', 'puzzleProgress', 'stats'
-        ]);
-      allow delete: if false;
-    }
+async function runConsentFlow(): Promise<void> {
+  const { isConsentFormAvailable, status } = await AdMob.requestConsentInfo();
+  // For non-EEA users, status is NOT_REQUIRED immediately — form never shown
+  if (isConsentFormAvailable && status === AdmobConsentStatus.REQUIRED) {
+    await AdMob.showConsentForm();
   }
 }
+
+async function preloadInterstitial(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  interstitialReady = false;
+  await AdMob.removeAllListeners();
+  await AdMob.prepareInterstitial({ adId: INTERSTITIAL_AD_ID } as AdOptions);
+  await AdMob.addListener(InterstitialAdPluginEvents.Loaded, () => {
+    interstitialReady = true;
+  });
+  await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+    interstitialReady = false;
+    void preloadInterstitial(); // pre-warm for next level
+  });
+}
+
+async function showBanner(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  const options: BannerAdOptions = {
+    adId: BANNER_AD_ID,
+    adSize: BannerAdSize.ADAPTIVE_BANNER,
+    position: BannerAdPosition.BOTTOM_CENTER,
+    margin: 0,
+    isTesting: false,
+  };
+  await AdMob.showBanner(options);
+}
+
+async function removeBanner(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  await AdMob.removeBanner();
+}
+
+// Resolves when ad closes, or immediately if no ad is ready.
+// Always resolves — never rejects — so the win flow is never blocked.
+async function showInterstitialIfReady(): Promise<void> {
+  if (!Capacitor.isNativePlatform() || !interstitialReady) return;
+  return new Promise<void>((resolve) => {
+    // These listeners fire after the Dismissed/FailedToShow listeners
+    // set up in preloadInterstitial(), so resolution happens correctly.
+    void AdMob.addListener(InterstitialAdPluginEvents.Dismissed,   () => resolve());
+    void AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => resolve());
+    void AdMob.showInterstitial();
+  });
+}
+
+export const adService = {
+  initialize,
+  showBanner,
+  removeBanner,
+  showInterstitialIfReady,
+};
 ```
 
-**Integrity notes:**
-- The score formula is validated in security rules so clients cannot submit fake low scores.
-- `submittedAt` must equal `request.time` (server timestamp), preventing backdated submissions.
-- Leaderboard entries are immutable (no update/delete) to prevent tampering.
-- Move count is bounded (< 1000) as a basic sanity check.
-- For stronger anti-cheat: consider Cloud Functions that validate the move sequence server-side. For a casual puzzle game, client-side validation with security rules is adequate.
-
-**Firestore Indexes Required:**
-
-```
-Collection: leaderboard
-  - puzzleId ASC, score ASC           (top scores per puzzle)
-  - userId ASC, submittedAt DESC      (user's recent submissions)
-  - difficulty ASC, score ASC         (top scores per difficulty)
-```
+> Implementation note: `removeAllListeners()` is called at the start of each `preloadInterstitial()` to prevent duplicate event registrations across repeated preload cycles. The build phase must verify this API exists in v8.0.0 or use per-listener `remove()` handles instead.
 
 ---
 
-## Routing Structure
+## Modified Files
 
-Use **React Router v6** with three main routes:
+### `src/main.tsx`
+
+Add one line alongside `initNative()`. Both are fire-and-forget at startup.
 
 ```typescript
-// App.tsx routes
-<Routes>
-  <Route path="/" element={<HomePage />} />
-  <Route path="/play/:puzzleId" element={<GamePage />} />
-  <Route path="/leaderboard" element={<LeaderboardPage />} />
-  <Route path="/leaderboard/:puzzleId" element={<LeaderboardPage />} />
-</Routes>
+import { adService } from './services/adService';
+
+void initNative();
+void adService.initialize();   // <-- add this line
+useAuthStore.getState().initAuth();
+
+createRoot(rootElement).render(...)
 ```
 
-| Route | Component | Description |
-|-------|-----------|-------------|
-| `/` | `HomePage` | Difficulty selector + puzzle grid. Default landing page. |
-| `/play/:puzzleId` | `GamePage` | The game board for a specific puzzle. `puzzleId` like "beginner-01". |
-| `/leaderboard` | `LeaderboardPage` | Global leaderboard view with puzzle filter dropdown. |
-| `/leaderboard/:puzzleId` | `LeaderboardPage` | Pre-filtered leaderboard for a specific puzzle. |
+**Why here, not inside `initNative()`:**
+`initNative()` has its own early-return guard for non-native platforms. `adService` has an identical guard. Keeping them separate preserves single-responsibility. `initNative()` owns the platform shell (StatusBar, backButton); `adService` owns monetization. Neither depends on the other.
 
-**No `/login` route.** Use Firebase UI or a modal dialog for authentication. Login should not be a separate page -- it breaks flow. Show a login prompt when the user tries to submit a score while unauthenticated.
+**Why before `createRoot()`:**
+AdMob and UMP need maximum lead time. The UMP consent dialog is a native Android overlay — it appears above everything including the WebView, so there is no need to wait for React to be ready. Starting early gives the interstitial preload time to complete before the user finishes their first puzzle.
+
+**What does NOT change in `main.tsx`:**
+`createRoot()` is not delayed. The `isLoading` auth gate is not modified. AdMob initialization never blocks the React tree.
 
 ---
 
-## File/Folder Organization
+### `src/screens/GameScreen/GameScreen.tsx`
 
-```
-src/
-+-- main.tsx                          # Entry point, renders App
-+-- App.tsx                           # Router + providers
-+-- vite-env.d.ts                     # Vite types
-|
-+-- components/                       # React components
-|   +-- layout/
-|   |   +-- Header.tsx
-|   |   +-- Layout.tsx
-|   |
-|   +-- game/
-|   |   +-- GameBoard.tsx             # The 6x6 board container
-|   |   +-- Vehicle.tsx               # Individual car/truck (draggable)
-|   |   +-- Grid.tsx                  # Grid lines + exit marker
-|   |   +-- GameHUD.tsx               # Move counter, timer, buttons
-|   |   +-- WinModal.tsx              # Victory overlay
-|   |
-|   +-- puzzle-select/
-|   |   +-- DifficultySelector.tsx    # Beginner/Inter/Adv/Expert tabs
-|   |   +-- PuzzleGrid.tsx            # Grid of puzzle cards
-|   |   +-- PuzzleCard.tsx            # Single puzzle thumbnail
-|   |
-|   +-- leaderboard/
-|   |   +-- LeaderboardTable.tsx
-|   |   +-- LeaderboardRow.tsx
-|   |   +-- PuzzleFilter.tsx
-|   |
-|   +-- auth/
-|   |   +-- LoginModal.tsx
-|   |   +-- UserMenu.tsx
-|   |
-|   +-- ui/                           # Shared/generic UI components
-|       +-- Button.tsx
-|       +-- Modal.tsx
-|       +-- Spinner.tsx
-|       +-- SoundToggle.tsx
-|
-+-- engine/                           # Pure game logic (NO React imports)
-|   +-- gameReducer.ts                # State reducer
-|   +-- moveValidator.ts              # Legal move computation
-|   +-- boardUtils.ts                 # Grid helpers, collision detection
-|   +-- scoreCalculator.ts            # Score formula
-|   +-- types.ts                      # Game-related TypeScript types
-|
-+-- contexts/
-|   +-- AuthContext.tsx                # Firebase auth state provider
-|   +-- GameContext.tsx                # Game state provider (wraps useReducer)
-|
-+-- hooks/
-|   +-- useGameState.ts               # Consumer hook for GameContext
-|   +-- useAuth.ts                    # Consumer hook for AuthContext
-|   +-- useLeaderboard.ts             # Firestore leaderboard queries
-|   +-- useUserProgress.ts            # Firestore user progress
-|   +-- useTimer.ts                   # requestAnimationFrame-based timer
-|   +-- useDrag.ts                    # Pointer/touch drag logic for vehicles
-|   +-- useSound.ts                   # Sound effect playback
-|
-+-- firebase/
-|   +-- config.ts                     # Firebase initialization
-|   +-- auth.ts                       # signIn, signOut, onAuthStateChanged wrappers
-|   +-- leaderboardService.ts         # submitScore, getTopScores, getUserScores
-|   +-- userService.ts                # createProfile, updateProgress
-|
-+-- data/
-|   +-- puzzles/
-|   |   +-- beginner.json
-|   |   +-- intermediate.json
-|   |   +-- advanced.json
-|   |   +-- expert.json
-|   +-- puzzleIndex.ts                # Aggregates all puzzles, provides lookup
-|   +-- vehicleColors.ts              # Color palette for vehicles
-|
-+-- assets/
-|   +-- sounds/
-|   |   +-- slide.mp3
-|   |   +-- win.mp3
-|   |   +-- start.mp3
-|   +-- vehicles/                     # SVG vehicle shapes (if not inline)
-|       +-- car-horizontal.svg
-|       +-- car-vertical.svg
-|       +-- truck-horizontal.svg
-|       +-- truck-vertical.svg
-|
-+-- styles/
-|   +-- global.css                    # CSS reset, variables, fonts
-|   +-- game.css                      # Game board specific styles
-|   +-- vehicles.css                  # Vehicle colors, animations
-|
-+-- utils/
-    +-- formatTime.ts                 # "1:23" from milliseconds
-    +-- cn.ts                         # classNames helper (or use clsx)
+Two changes: banner lifecycle and interstitial in win flow.
+
+**Change 1 — Banner lifecycle:**
+
+```typescript
+// Add to GameScreen, alongside existing useEffects:
+useEffect(() => {
+  void adService.showBanner();
+  return () => { void adService.removeBanner(); };
+}, []);
 ```
 
-**Folder rationale:**
-- `engine/` is the most important separation. It contains zero framework dependencies. You can test it with plain `vitest` or `jest` without any React test utilities.
-- `firebase/` wraps all Firebase SDK calls. Components never import `firebase/firestore` directly. This makes it possible to mock Firebase in tests and to swap backends later.
-- `hooks/` contains all custom hooks. This avoids cluttering component files with complex logic.
-- `data/` contains static puzzle definitions as JSON, imported at build time. Zero runtime cost after bundling.
-- `components/` is organized by feature area (game, puzzle-select, leaderboard, auth, ui) rather than by component type (atoms, molecules, organisms). Feature-based organization scales better for this project size.
+The empty dependency array means: show banner when GameScreen mounts, remove it when GameScreen unmounts. This correctly handles both navigation away (PuzzleSelect, MainMenu) and the win flow (banner removed before interstitial, not re-shown unless player stays on GameScreen).
+
+**Change 2 — Interstitial in win flow:**
+
+The existing win `setTimeout` callback:
+```typescript
+const timer = setTimeout(() => {
+  setIsWinAnimating(false);
+  setShowWinModal(true);
+}, 2000);
+```
+
+Changes to:
+```typescript
+const timer = setTimeout(() => {
+  setIsWinAnimating(false);
+  void (async () => {
+    await adService.showInterstitialIfReady(); // resolves immediately if no ad
+    setShowWinModal(true);
+  })();
+}, 2000);
+```
+
+The banner is already removed by the unmount path when the user navigates away; no explicit `removeBanner()` is needed in the win flow itself because `showInterstitialIfReady` will gracefully coexist or the banner `useEffect` cleanup runs on unmount.
+
+If the banner and interstitial conflict on some devices (some AdMob versions raise an error if banner is visible when interstitial shows), add `await adService.removeBanner()` before `await adService.showInterstitialIfReady()` in the async block above.
 
 ---
 
-## Data Flow Patterns
+### `android/app/src/main/AndroidManifest.xml`
 
-### Pattern 1: Vehicle Drag-and-Drop
+Two additions: the AdMob App ID meta-data tag, and the `AD_ID` permission required for Android 13+.
 
-```
-User touches/clicks vehicle
-  -> useDrag hook captures pointer
-  -> On pointer move: compute snapped grid position
-  -> On pointer up:
-     1. Call getValidMoves() from engine
-     2. If move is valid: dispatch MOVE_VEHICLE
-     3. Play slide sound
-     4. GameBoard re-renders with updated positions
-     5. Check win condition
-```
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        ...existing attributes unchanged...>
 
-**Implementation approach:** Use pointer events (`onPointerDown`, `onPointerMove`, `onPointerUp`) rather than HTML5 drag-and-drop. Pointer events work on both mouse and touch, give pixel-level control, and avoid the quirks of the drag-and-drop API (ghost images, drop zones, etc.).
+        ...existing content unchanged...
 
-Constrain dragging to the vehicle's orientation axis. Snap to grid cells on release. Show a visual preview during drag (translate the vehicle element with CSS transform).
+        <!-- AdMob App ID — value sourced from strings.xml -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id" />
 
-### Pattern 2: Score Submission
+    </application>
 
-```
-WIN detected
-  -> WinModal shown with score summary
-  -> User clicks "Submit Score"
-  -> If not authenticated: show LoginModal first
-  -> Call leaderboardService.submitScore({
-       puzzleId, userId, displayName,
-       moves, timeMs, score, difficulty
-     })
-  -> Firestore security rules validate the submission
-  -> Update userProfiles/{uid}.puzzleProgress.{puzzleId}
-  -> Refresh leaderboard display
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required for Android 13+ (API 33+) for ad personalization -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+</manifest>
 ```
 
-**Optimistic vs. pessimistic:** Use pessimistic updates for score submission (wait for Firestore confirmation before showing "Submitted!"). Scores are important -- don't tell the user it worked if it didn't.
-
-### Pattern 3: Puzzle Loading
-
-```
-User navigates to /play/beginner-05
-  -> GamePage reads puzzleId from URL params
-  -> Looks up puzzle in static JSON data (puzzleIndex.ts)
-  -> Dispatches LOAD_PUZZLE to game reducer
-  -> Board renders with initial vehicle positions
-  -> Timer starts on first move (not on load)
-```
-
-No Firestore read needed. Instant.
+The App ID value lives in `strings.xml` (not inline in the manifest) to keep it out of diffs and allow per-build-type overrides.
 
 ---
 
-## Anti-Patterns to Avoid
+### `android/app/src/main/res/values/strings.xml`
 
-### Anti-Pattern 1: Game Logic in Components
-**What:** Putting move validation, win detection, or board state manipulation directly inside React components.
-**Why bad:** Untestable without rendering React. Difficult to refactor. Logic gets duplicated across components.
-**Instead:** Keep all game logic in `engine/`. Components only dispatch actions and render state.
+Add the AdMob App ID string resource. This file may not exist yet; create it if absent.
 
-### Anti-Pattern 2: Storing Full Board State in Firestore
-**What:** Saving the complete board state (all vehicle positions) to Firestore on every move for "sync" or "resume" features.
-**Why bad:** Firestore charges per write. 80+ moves per puzzle = 80+ writes. Expensive and unnecessary.
-**Instead:** Store only the final score on completion. If you want resume functionality, use `localStorage` for in-progress games.
+```xml
+<resources>
+    <string name="admob_app_id">ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX</string>
+</resources>
+```
 
-### Anti-Pattern 3: Fetching Leaderboard Data Without Pagination
-**What:** Loading all leaderboard entries for a puzzle.
-**Why bad:** If a popular puzzle has 10,000+ entries, you're loading and paying for all of them.
-**Instead:** Always use `.limit(10)` or `.limit(25)` on leaderboard queries. Implement cursor-based pagination if users want to see beyond top 10.
-
-### Anti-Pattern 4: Real-Time Listeners for Static Data
-**What:** Using `onSnapshot` for puzzle definitions or leaderboard data.
-**Why bad:** Puzzles never change. Leaderboards change infrequently. Real-time listeners keep connections open and consume read quota on every change.
-**Instead:** Use `getDoc`/`getDocs` (one-time reads) for puzzles and leaderboards. Add a "Refresh" button for leaderboards rather than live updates.
-
-### Anti-Pattern 5: CSS Pixel Positioning for Vehicles
-**What:** Using absolute pixel values (`left: 120px`) for vehicle positioning.
-**Why bad:** Breaks on different screen sizes. Requires complex responsive calculations.
-**Instead:** Use CSS Grid for the board. Position vehicles using `grid-row` and `grid-column`. During drag, use CSS `transform: translate()` for smooth animation, then snap to grid on release.
+During development, use the Google test App ID: `ca-app-pub-3940256099942544~3347511713`.
+Replace with the real App ID before the production build.
 
 ---
 
-## Rendering Strategy: CSS Grid + Transform
+### `src/screens/GameScreen/GameScreen.module.css`
 
-The board should be a CSS Grid, not absolute positioning:
+The ADAPTIVE_BANNER renders as a native Android view below the WebView, at the bottom of the screen. Without padding, it overlaps the `ControlBar`. Add bottom padding when running on native.
+
+In `GameScreen.tsx`, conditionally apply a padding class:
+
+```typescript
+import { Capacitor } from '@capacitor/core';
+const isNative = Capacitor.isNativePlatform();
+
+// In the return JSX:
+<div className={`${styles.container} ${isNative ? styles.withBanner : ''}`}>
+```
+
+In `GameScreen.module.css`:
 
 ```css
-.game-board {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(6, 1fr);
-  aspect-ratio: 1;              /* Always square */
-  max-width: 500px;
-  gap: 2px;
-  position: relative;           /* For drag overlay */
+.withBanner {
+  padding-bottom: 60px; /* ADAPTIVE_BANNER is ~50–56dp; 60px gives safe clearance */
 }
-
-.vehicle {
-  border-radius: 8px;
-  cursor: grab;
-  transition: transform 0.15s ease;  /* Smooth snap animation */
-  touch-action: none;                /* Prevent browser scroll during drag */
-  z-index: 1;
-}
-
-.vehicle.dragging {
-  z-index: 10;
-  cursor: grabbing;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: none;             /* No transition during active drag */
-}
-
-.vehicle.car.horizontal {
-  grid-column: span 2;
-}
-
-.vehicle.truck.horizontal {
-  grid-column: span 3;
-}
-
-.vehicle.car.vertical {
-  grid-row: span 2;
-}
-
-.vehicle.truck.vertical {
-  grid-row: span 3;
-}
-```
-
-**Vehicle placement via inline style (dynamic):**
-```tsx
-<div
-  className={`vehicle ${type} ${orientation}`}
-  style={{
-    gridRowStart: position.row + 1,    // CSS grid is 1-indexed
-    gridColumnStart: position.col + 1,
-    transform: isDragging ? `translate(${dragOffsetX}px, ${dragOffsetY}px)` : 'none',
-  }}
-/>
 ```
 
 ---
 
-## Sound Architecture
+### `android/app/build.gradle`
 
-Use the **Web Audio API** through a simple singleton manager, not `<audio>` elements:
+**No manual changes required.** The `@capacitor-community/admob` plugin auto-registers via Capacitor's sync mechanism. Running `npx cap sync` after `npm install @capacitor-community/admob` writes the plugin dependency into `android/app/capacitor.build.gradle` (the auto-generated file). Verify it appears there after sync.
 
-```typescript
-// utils/soundManager.ts
+---
 
-class SoundManager {
-  private context: AudioContext | null = null;
-  private buffers: Map<string, AudioBuffer> = new Map();
-  private muted: boolean = false;
+## Initialization Sequence
 
-  async init() {
-    this.context = new AudioContext();
-    // Preload all sounds
-    await Promise.all([
-      this.load('slide', '/sounds/slide.mp3'),
-      this.load('win', '/sounds/win.mp3'),
-      this.load('start', '/sounds/start.mp3'),
-    ]);
-  }
-
-  private async load(name: string, url: string) {
-    const response = await fetch(url);
-    const buffer = await response.arrayBuffer();
-    const audioBuffer = await this.context!.decodeAudioData(buffer);
-    this.buffers.set(name, audioBuffer);
-  }
-
-  play(name: string) {
-    if (this.muted || !this.context) return;
-    const buffer = this.buffers.get(name);
-    if (!buffer) return;
-    const source = this.context.createBufferSource();
-    source.buffer = buffer;
-    source.connect(this.context.destination);
-    source.start(0);
-  }
-
-  toggleMute() {
-    this.muted = !this.muted;
-    localStorage.setItem('soundMuted', String(this.muted));
-  }
-}
-
-export const soundManager = new SoundManager();
+```
+App launch
+  |
+  +-- void initNative()              [non-blocking: StatusBar, backButton]
+  |
+  +-- void adService.initialize()    [non-blocking, runs in parallel]
+  |     |
+  |     +-- AdMob.initialize()
+  |     +-- runConsentFlow()
+  |     |     +-- requestConsentInfo()
+  |     |     +-- showConsentForm()   [only if EEA user AND form available]
+  |     |                             [native dialog over WebView — no React involvement]
+  |     +-- preloadInterstitial()     [background HTTP fetch, ready before first win]
+  |
+  +-- useAuthStore.getState().initAuth()   [Firebase onAuthStateChanged]
+  |
+  +-- createRoot().render()
+        |
+        +-- App.tsx
+              +-- isLoading=true  →  loading spinner  [Firebase resolving]
+              +-- isLoading=false →  Routes rendered
+                    |
+                    +-- GameScreen mounts
+                          +-- useEffect → adService.showBanner()
 ```
 
-**Why Web Audio API over `<audio>` elements:**
-- Lower latency (important for slide sound feedback during drag)
-- Can play the same sound overlapping
-- Better mobile support
-- No DOM elements needed
-
-**Important:** AudioContext must be created after a user gesture (browser policy). Initialize on the first click/tap anywhere in the app.
+Key properties of this sequence:
+- Firebase auth and AdMob init are parallel; neither waits for the other.
+- The `isLoading` gate is unchanged — it gates only on `authStore.isLoading` (Firebase). AdMob never delays the UI.
+- The UMP consent dialog (if shown) is a native Android overlay. It does not block React rendering and is independent of `isLoading`.
+- If `adService.initialize()` throws (wrong App ID, no network), it is caught and logged. The app continues normally without ads.
 
 ---
 
-## Scalability Considerations
+## UMP Consent Flow — Non-Blocking Design
 
-| Concern | At 100 users | At 10K users | At 1M users |
-|---------|--------------|--------------|-------------|
-| **Puzzle loading** | Static JSON, instant | Same (bundled) | Same (bundled) |
-| **Leaderboard reads** | getDocs with limit(10), fast | Same, add caching | Cloud Functions to aggregate; cache top 10 in a single doc |
-| **Leaderboard writes** | Direct Firestore write | Same | Cloud Functions with rate limiting; batch writes |
-| **Auth** | Firebase free tier | Firebase free tier | Firebase Blaze plan |
-| **Score integrity** | Security rules | Security rules | Cloud Functions validating move sequences |
-| **Bundle size** | ~200KB gzipped | Same | Code-split routes with React.lazy |
+The `isLoading` gate in `App.tsx` is driven solely by `authStore.isLoading` (Firebase). UMP is independent.
 
-**For v1 (targeting < 10K users), the simple architecture described above is sufficient.** No need for Cloud Functions, server-side rendering, or caching layers.
+| User Region | `requestConsentInfo` result | Consent form shown | Ads load |
+|---|---|---|---|
+| Non-EEA (most users) | `NOT_REQUIRED` immediately | No | Yes, immediately after init |
+| EEA / UK (first launch) | `REQUIRED`, form available | Yes — native dialog | After user interacts with form |
+| EEA / UK (returning) | `OBTAINED` | No | Yes, stored consent used |
+
+The consent dialog is a native Android dialog, not anything in the React tree. It appears above the WebView regardless of what React is rendering. For non-EEA users (the majority for most Play Store apps), `requestConsentInfo` returns `NOT_REQUIRED` synchronously-fast and no form is shown. Gameplay is never blocked for non-EU users.
+
+**Google enforcement note:** Since January 2024, Google requires publishers serving EEA/UK users to use a certified CMP. The `@capacitor-community/admob` v8.0.0 plugin delegates to the bundled Google UMP SDK, satisfying this requirement. No separate CMP vendor is needed.
 
 ---
 
-## Testing Strategy (Architecture Implications)
+## Interstitial Preload and Show Flow
 
-The separation of `engine/` from `components/` enables a clean testing pyramid:
+```
+App start
+  └── preloadInterstitial()    [HTTP fetch starts in background]
 
-| Layer | Tool | What to Test |
-|-------|------|-------------|
-| `engine/` | Vitest (unit) | Move validation, win detection, score calculation, reducer transitions |
-| `hooks/` | React Testing Library | State transitions, Firestore mock integration |
-| `components/` | React Testing Library | Rendering, user interactions, accessibility |
-| E2E | Playwright | Full puzzle solve flow, leaderboard submission |
+User solves puzzle → state.isWon = true
+  |
+  +-- soundService.playWin()
+  +-- canvas-confetti
+  +-- setTimeout(2000ms)
+        |
+        +-- setIsWinAnimating(false)
+        +-- adService.showInterstitialIfReady()
+        |     |
+        |     +-- interstitialReady=true  →  AdMob.showInterstitial()
+        |     |     user watches interstitial ad
+        |     |     user dismisses
+        |     |       +-- InterstitialAdPluginEvents.Dismissed fires
+        |     |             +-- Promise resolves
+        |     |             +-- preloadInterstitial() called  [next ad warms up]
+        |     |
+        |     +-- interstitialReady=false  →  Promise resolves immediately
+        |                                     [no ad shown, no delay]
+        |
+        +-- setShowWinModal(true)
+              |
+              +-- WinModal renders
+                    |
+                    +-- "Next Puzzle"         → navigate → GameScreen remounts → showBanner()
+                    +-- "Back to Selection"   → PuzzleSelectScreen → no banner
+                    +-- WinModal onClose      → setShowWinModal(false)
+                                                GameScreen still mounted → banner still showing
+```
 
-**Test priority:** `engine/` first (highest value, easiest to test), then component integration tests for GameBoard drag-and-drop, then E2E for the happy path.
+**Frequency cap:** Do not attempt to enforce a frequency cap in code. Configure it in the AdMob console (minimum interval between interstitials, e.g., every 3 minutes or every 3 levels). The `interstitialReady` flag provides a soft natural cap because preloading takes 2–5 seconds on a normal connection — consecutive rapid wins will not all show ads.
+
+---
+
+## Banner Positioning
+
+ADAPTIVE_BANNER for a typical Android phone is approximately 50–56 density-independent pixels tall. The plugin inserts it as a native view below the WebView. CSS `padding-bottom: 60px` on the `GameScreen` container div is the correct fix — the banner does not physically push content up; the WebView ignores it unless padding is applied manually.
+
+Only `GameScreen` needs this padding. `PuzzleSelectScreen`, `MainMenuScreen`, and `ProfileScreen` do not show the banner (it is removed on GameScreen unmount).
+
+---
+
+## File Change Summary
+
+| File | Change Type | What Changes |
+|---|---|---|
+| `src/services/adService.ts` | **New** | Full ad lifecycle singleton |
+| `src/main.tsx` | Modified | One line: `void adService.initialize()` |
+| `src/screens/GameScreen/GameScreen.tsx` | Modified | Banner `useEffect` + interstitial in win setTimeout |
+| `src/screens/GameScreen/GameScreen.module.css` | Modified | `.withBanner { padding-bottom: 60px }` |
+| `android/app/src/main/AndroidManifest.xml` | Modified | AdMob `<meta-data>` + `AD_ID` permission |
+| `android/app/src/main/res/values/strings.xml` | Modified or Created | `admob_app_id` string resource |
+| `android/app/build.gradle` | **No change** | `npx cap sync` handles plugin dependency |
+
+---
+
+## Suggested Build Order for Phases
+
+**Phase 1 — Android native plumbing (zero JS changes)**
+- `npm install @capacitor-community/admob`
+- `npx cap sync`
+- Add `<meta-data>` to `AndroidManifest.xml`
+- Create/update `strings.xml` with test App ID
+- Add `AD_ID` permission to `AndroidManifest.xml`
+- Build and run; confirm no build errors
+
+**Phase 2 — adService + initialization + UMP**
+- Create `src/services/adService.ts` with `initialize()` and `runConsentFlow()`
+- Add `void adService.initialize()` to `main.tsx`
+- Test with `debugGeography: AdmobConsentDebugGeography.EEA` to force UMP dialog
+- Verify non-EEA path: form never shown, no delay
+
+**Phase 3 — Banner ad**
+- Add `showBanner()` / `removeBanner()` to `adService.ts`
+- Add `useEffect` to `GameScreen.tsx`
+- Add `.withBanner` padding class to `GameScreen.module.css`
+- Test: banner visible on GameScreen, absent on other screens, no ControlBar overlap
+
+**Phase 4 — Interstitial ad**
+- Add `preloadInterstitial()` and `showInterstitialIfReady()` to `adService.ts`
+- Wire into the `setTimeout` callback in `GameScreen.tsx`
+- Test: WinModal appears only after ad is dismissed, not during it
+- Test: Win without a loaded interstitial — WinModal appears without delay
+
+**Phase 5 — Production IDs and Play Store**
+- Replace all test IDs with real AdMob App ID and ad unit IDs in `strings.xml` and `adService.ts`
+- Update privacy policy to declare ad serving and data collection
+- Update Play Store data safety section
+- Verify consent dialog in production AdMob account (requires real GDPR message configured in AdMob console)
+
+This order is strictly dependency-driven: Android native support must exist before any JS bridge calls work; consent must execute before ad requests; the simpler banner must work before the more stateful interstitial.
+
+---
+
+## Risks and Mitigations
+
+| Risk | Severity | Mitigation |
+|---|---|---|
+| Banner overlaps ControlBar | Medium | `padding-bottom: 60px` on `.withBanner` class |
+| Duplicate event listeners on repeated `preloadInterstitial()` | Medium | Call `AdMob.removeAllListeners()` before re-registering; or track and call `remove()` on prior handle |
+| UMP form not appearing (AdMob account misconfigured) | Low | Always test with `debugGeography: EEA` and a registered test device |
+| Missing `AD_ID` permission causes Play Store rejection | High | Add to manifest before submission; required for Android 13+ |
+| `adService.initialize()` throws silently | Low | Wrap in try/catch; log; continue; never let ad errors reach the user |
+| Interstitial and banner conflict on same screen | Low | If needed, `await adService.removeBanner()` before `showInterstitialIfReady()` in win flow |
+| `showInterstitialIfReady()` never resolves if event does not fire | Medium | Add a timeout fallback in the Promise (5–8 seconds) that resolves and continues to WinModal |
 
 ---
 
 ## Sources
 
-- React documentation (component patterns, hooks, context): HIGH confidence from training data
-- Firebase Firestore documentation (data model, security rules, indexes): HIGH confidence from training data
-- Web Audio API (MDN): HIGH confidence from training data
-- CSS Grid layout patterns: HIGH confidence from training data
-- React Router v6 patterns: HIGH confidence from training data
-- NOTE: Web search and Context7 were unavailable during this research session. All recommendations are based on well-established patterns in the React and Firebase ecosystems that have been stable for 2+ years. Confidence is MEDIUM overall due to inability to verify against current documentation versions.
+- [@capacitor-community/admob npm (v8.0.0)](https://www.npmjs.com/package/@capacitor-community/admob) — HIGH confidence
+- [capacitor-community/admob GitHub](https://github.com/capacitor-community/admob) — HIGH confidence
+- [Google UMP SDK for Android](https://developers.google.com/admob/android/privacy) — HIGH confidence
+- [Capacitor Ads guide](https://capacitorjs.com/docs/guides/ads) — HIGH confidence

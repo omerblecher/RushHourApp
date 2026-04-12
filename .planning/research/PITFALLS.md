@@ -1,610 +1,455 @@
-# Domain Pitfalls
+# AdMob Integration Pitfalls — Rush Hour Puzzle Game
 
-**Domain:** Rush Hour sliding puzzle game (React + Firebase + SVG/CSS)
-**Researched:** 2026-02-16
-**Confidence:** MEDIUM (based on extensive domain knowledge; web verification unavailable)
-
----
-
-## Critical Pitfalls
-
-Mistakes that cause rewrites, broken gameplay, or runaway costs.
+**Domain:** Adding Google AdMob (banner + interstitial) to an existing Capacitor 8 Android app already on Google Play with Firebase Auth wired.
+**Researched:** 2026-04-12
+**Confidence:** MEDIUM — Android/AdMob specifics verified via official Google docs and community issues; Capacitor 8 specifics extrapolated from Capacitor 6/7 community findings where v8 data was sparse.
 
 ---
 
-### Pitfall 1: Collision Detection Off-by-One and Direction Blindness
+## Critical Pitfalls (Account Suspension or Build Failure Risk)
 
-**What goes wrong:** Vehicles clip through each other, overlap on the grid, or get stuck in impossible positions. The most common bug is checking collisions only at the destination cell instead of along the entire slide path. A car sliding 3 cells right must check ALL intermediate cells, not just the final position.
+---
 
-**Why it happens:**
-- Developers model the grid as a simple 2D array and only check `grid[targetRow][targetCol]` instead of every cell between current position and target.
-- Forgetting that vehicles occupy multiple cells (a truck is 3 cells, a car is 2 cells) and checking only the "head" cell.
-- Allowing diagonal movement or movement perpendicular to the vehicle's orientation due to missing orientation checks.
+### Pitfall C1: Missing or Incorrect AdMob App ID in AndroidManifest.xml
 
-**Consequences:**
-- Vehicles overlap visually and in state, corrupting the puzzle.
-- Players can "cheat" by sliding through blockers.
-- Move counter becomes meaningless if invalid moves are counted.
-- Puzzle becomes unsolvable mid-game due to corrupted state.
+**Severity:** CRITICAL — App crashes immediately on launch without it.
+
+**What goes wrong:** The Google Mobile Ads SDK reads `com.google.android.gms.ads.APPLICATION_ID` from `AndroidManifest.xml` at startup. If the tag is absent, has the wrong key name, or contains a test/placeholder value in a production release, the app throws `IllegalStateException: The Google Mobile Ads SDK was initialized incorrectly` and crashes before any screen renders.
+
+**Why it happens in this project:**
+Looking at `android/app/src/main/AndroidManifest.xml`, there is currently NO `<meta-data>` tag for AdMob. The manifest only has the FileProvider entry and `INTERNET` permission. Adding the plugin without adding this tag causes an instant crash in production.
+
+**What the tag must look like:**
+```xml
+<application ...>
+    <!-- REQUIRED: AdMob App ID — get this from your AdMob console -->
+    <meta-data
+        android:name="com.google.android.gms.ads.APPLICATION_ID"
+        android:value="ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY"/>
+</application>
+```
+
+The `~` character and the 10-digit suffix after it are mandatory. The format is NOT the same as an ad unit ID (which starts with `ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ`).
+
+**Common mistake:** Developers copy a single ad unit ID from the AdMob console instead of the App ID. These look similar but are different: the App ID uses `~` (tilde) while ad unit IDs use `/` (slash).
 
 **Prevention:**
-1. Model each vehicle as `{ id, row, col, length, orientation: 'H' | 'V' }`.
-2. Maintain a `grid[6][6]` occupancy map that is recomputed from vehicle positions (single source of truth).
-3. For any move, iterate through ALL cells the vehicle would pass through AND occupy at the destination.
-4. Enforce orientation: horizontal vehicles can only move left/right, vertical only up/down.
-5. Clamp movement to grid boundaries BEFORE collision checking.
+- Add the `<meta-data>` tag before wiring any JavaScript code.
+- Test with `npx cap run android --target emulator` immediately after adding the tag to confirm no crash.
+- Also add the App ID to `android/app/src/main/res/values/strings.xml` as a named resource and reference it from the manifest if you want to switch between test and prod values via build variants.
 
-**Detection:** Write unit tests that attempt to slide a vehicle through another vehicle. Test boundary cases: vehicle at edge trying to move off-grid, two vehicles adjacent trying to swap.
+**Phase:** Add this in the very first implementation step, before writing a single line of JS ad code.
 
-```typescript
-// WRONG: Only checks destination
-function canMove(vehicle, targetCol) {
-  return grid[vehicle.row][targetCol] === null;
-}
+---
 
-// RIGHT: Checks entire path and all cells the vehicle will occupy
-function canMove(vehicle, delta) {
-  const newCol = vehicle.col + delta;
-  const minCol = Math.min(vehicle.col, newCol);
-  const maxCol = Math.max(vehicle.col + vehicle.length - 1, newCol + vehicle.length - 1);
+### Pitfall C2: Using Production Ad Unit IDs During Development / Testing
 
-  for (let c = minCol; c <= maxCol; c++) {
-    if (c < 0 || c >= 6) return false;
-    const occupant = grid[vehicle.row][c];
-    if (occupant !== null && occupant !== vehicle.id) return false;
+**Severity:** CRITICAL — Can suspend your AdMob account permanently.
+
+**What goes wrong:** Every impression and click against a production ad unit ID is recorded. If you click your own ads during testing (even accidentally), Google's invalid traffic detection flags the account. Suspensions are not easily reversed, and earnings are clawed back.
+
+**Why it happens:**
+- Developer hardcodes real ad unit IDs from day one and tests on their device without configuring test mode.
+- Debug and release builds share the same ID string via a constant — no environment separation.
+- Developer installs the release APK on their own phone "to see how it looks" and taps the banner.
+
+**Google's official test IDs to use during development:**
+```
+Banner:        ca-app-pub-3940256099942544/6300978111
+Interstitial:  ca-app-pub-3940256099942544/1033173712
+```
+These are Google-owned test units — no click or impression against them counts toward your account.
+
+**Prevention (specific to this project's manual build setup):**
+- Keep two constants in TypeScript: `TEST_BANNER_ID` and `PROD_BANNER_ID`.
+- Use a build-time env variable (`VITE_ENV`) to switch: `const AD_UNIT = import.meta.env.VITE_ENV === 'production' ? PROD_BANNER_ID : TEST_BANNER_ID`.
+- Additionally, call `AdMob.initialize({ testingDevices: ['YOUR_DEVICE_HASH'] })` during development — this forces test ads even when the production ID is accidentally used.
+- Only ship the `.aab` built with `VITE_ENV=production` to Play Store.
+- Never side-load the production AAB onto your own device and tap ads.
+
+**Phase:** Environment separation must be designed before any ad unit ID touches the codebase.
+
+---
+
+### Pitfall C3: AD_SERVICES_CONFIG Manifest Merge Conflict (Firebase + AdMob)
+
+**Severity:** CRITICAL — Build fails; app cannot be compiled.
+
+**What goes wrong:** The Google Mobile Ads SDK and Firebase Analytics both inject a `<property>` element for `android.adservices.AD_SERVICES_CONFIG` into the merged manifest. One references `@xml/gma_ad_services_config` and the other references `@xml/ga_ad_services_config`. The Android manifest merger rejects duplicate property entries and fails the build with:
+
+```
+Manifest merger failed: Attribute property#android.adservices.AD_SERVICES_CONFIG@resource
+value=(@xml/gma_ad_services_config) from [play-services-ads] AndroidManifest.xml
+is also present in [firebase-analytics] AndroidManifest.xml value=(@xml/ga_ad_services_config)
+```
+
+**Why it happens in this project:** This project already has Firebase Auth via `google-services.json` and the `com.google.gms.google-services` plugin applied in `build.gradle`. Adding the AdMob dependency pulls in `play-services-ads`, which conflicts.
+
+**Fix:** Add `tools:replace="android:resource"` to the conflicting property in your app's `AndroidManifest.xml`:
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+    <application ...>
+        <property
+            android:name="android.adservices.AD_SERVICES_CONFIG"
+            android:resource="@xml/gma_ad_services_config"
+            tools:replace="android:resource" />
+    </application>
+</manifest>
+```
+
+The `xmlns:tools` namespace declaration must also be added to the root `<manifest>` element — it is currently absent from this project's manifest.
+
+**Phase:** Expect this on the first `./gradlew assembleDebug` after adding the AdMob dependency. Have the fix ready before the build attempt.
+
+---
+
+### Pitfall C4: Showing Ads Before GDPR Consent is Collected (EU Users)
+
+**Severity:** CRITICAL — AdMob policy violation; can result in account suspension or Play Store removal for EU/EEA users.
+
+**What goes wrong:** Google requires publishers serving ads to EEA (European Economic Area) and UK users to use a Google-certified Consent Management Platform before serving personalized ads. If your app loads and shows a banner before `requestConsentInfo()` and `showConsentFormIfRequired()` complete, you are serving ads without consent.
+
+**The correct initialization order:**
+```
+App opens
+  -> AdMob.initialize()           <- OK to call before consent
+  -> requestConsentInfo()
+  -> showConsentFormIfRequired()   <- Must complete before first ad load
+  -> AdMob.showBanner() / prepareInterstitial()
+```
+
+**Common mistake with Capacitor:** Developers call `AdMob.showBanner()` in a React `useEffect` that fires immediately, before the async consent chain has resolved. Because consent is async and the timing is unpredictable, ads sometimes appear before consent is collected on slower devices.
+
+**UMP support in `@capacitor-community/admob`:** The plugin exposes `requestConsentInfo()`, `showConsentForm()`, and `resetConsentInfo()`. Consent management via UMP IS supported in recent plugin versions but was absent in pre-4.x releases. Confirm the installed version supports it before writing consent code.
+
+**Key UMP behavior change (February 2025):** Google changed UMP SDK behavior — consent is no longer assumed when not explicitly given. Apps that previously assumed consent is "obtained" without displaying a form may now serve no personalized ads to EU users. Always explicitly call `showConsentFormIfRequired()`.
+
+**Consent revocation:** GDPR requires users to be able to withdraw consent at any time. Implement a "Privacy / Ad Preferences" option in app settings that calls `AdMob.showConsentForm()`. Failing to provide this is itself a violation.
+
+**Phase:** Consent flow must be implemented and tested with debugGeography set to EEA before any production release.
+
+---
+
+## High-Severity Pitfalls (Revenue Loss or Policy Warning Risk)
+
+---
+
+### Pitfall H1: Interstitial Ad Shown at App Launch or on Back-Press Exit
+
+**Severity:** HIGH — Direct Google Play policy violation ("Better Ads Experiences").
+
+**What goes wrong:** Google Play explicitly prohibits interstitial ads that:
+- Appear when the app first opens (before any user interaction).
+- Appear when the user presses the Back button to exit the app.
+- Cover the full screen without a visible countdown or close button.
+
+**Correct placement for this game:** Show the interstitial AFTER the win screen has displayed (user has seen their score) and BEFORE the next puzzle loads. This is an explicit natural break.
+
+**Do NOT do:**
+```
+User opens app -> show interstitial immediately
+User presses Back on main menu -> show interstitial before exit
+Show interstitial inside the active game play screen
+```
+
+**Do:**
+```
+User wins puzzle -> WinModal shows (2-second delay already exists in this app)
+  -> User taps "Next Puzzle"
+  -> Show interstitial (with close button visible)
+  -> Load next puzzle
+```
+
+This project's existing WinModal 2-second delay is already a natural break — the interstitial slots in cleanly here.
+
+**Rate limit:** Show no more than one interstitial per two user actions. Do not show an interstitial every single level on easy puzzles that players solve in 15 seconds.
+
+**Phase:** Design the trigger point explicitly in the phase plan. Do not leave placement as a "TBD detail."
+
+---
+
+### Pitfall H2: Banner Ad Placed Over or Adjacent to Interactive Game Elements
+
+**Severity:** HIGH — Policy violation; accidental clicks inflate invalid traffic metrics.
+
+**What goes wrong:** If a banner is displayed at the bottom of the game board and a vehicle is draggable near the bottom edge, users will accidentally tap the banner while dragging. Google's click-through rate analytics detect anomalously high CTR from puzzle games (natural interaction area overlaps ad) and may flag the placement.
+
+**Specific risk for Rush Hour:** The 6x6 grid board extends near the screen bottom on small phones (320px width target). A bottom-anchored banner that sits immediately below the last row creates accidental tap risk on vehicles dragged near row 6.
+
+**Prevention:**
+- Anchor the banner to the very bottom of the viewport using CSS `padding-bottom` on the game container to push the board up, ensuring a visible gap.
+- Never place a banner adjacent to the "Reset" or "Next Puzzle" buttons.
+- Prefer `ADAPTIVE_BANNER` format — it adjusts height automatically and is less likely to overlap content on small screens.
+
+---
+
+### Pitfall H3: Gradle Dependency Version Conflict (play-services-ads vs Firebase)
+
+**Severity:** HIGH — Build failure; or runtime crash from mismatched versions.
+
+**What goes wrong:** `@capacitor-community/admob` brings in `play-services-ads` which depends on `com.google.android.gms:play-services-measurement-base`. Firebase Analytics (already in this project via `google-services.json`) also depends on the same artifact. If the resolved versions differ between compile classpath and runtime classpath, the build may succeed but crash at runtime.
+
+**Additional conflict seen in community issues:** Java/Kotlin compilation can fail if the `compileDebugKotlin` task targets a different JVM version than `compileDebugJavaWithJavac`. This surfaces after adding a new plugin built with a different Kotlin target.
+
+**Prevention:**
+- After `npm install @capacitor-community/admob && npx cap sync`, run `./gradlew dependencies | grep play-services-measurement` to check for version conflicts.
+- If conflicts appear, pin the version in `android/app/build.gradle`:
+  ```groovy
+  configurations.all {
+      resolutionStrategy {
+          force 'com.google.android.gms:play-services-measurement-base:21.x.x'
+      }
   }
-  return true;
-}
-```
+  ```
+- Run `./gradlew assembleDebug` immediately after `npx cap sync` — do not wait until all ad code is written before the first build attempt.
 
 ---
 
-### Pitfall 2: Firebase Read Costs Exploding on Leaderboards
+### Pitfall H4: ProGuard / R8 Stripping AdMob or UMP Classes in Release Build
 
-**What goes wrong:** Firestore charges per document read. A naive leaderboard that loads all entries for a puzzle on every page view can generate thousands of reads per user session. With 80+ puzzles and a global leaderboard, costs scale multiplicatively.
+**Severity:** HIGH — Release build appears to work in debug but crashes in production.
 
-**Why it happens:**
-- Loading the full leaderboard (all entries) instead of top-N with `.limit()`.
-- Querying the leaderboard on every puzzle screen render (including re-renders from React state changes).
-- Not caching leaderboard data client-side.
-- Subscribing to real-time updates (`onSnapshot`) for leaderboards that change infrequently.
-- Each puzzle having its own leaderboard collection means 80+ potential query targets.
+**What goes wrong:** This project has `minifyEnabled true` in the release build type (confirmed in `android/app/build.gradle`). R8 shrinking can remove AdMob SDK classes referenced only via reflection. The debug build with `minifyEnabled false` works fine; the release build crashes.
 
-**Consequences:**
-- Firestore free tier (50K reads/day) exhausted by a few hundred users.
-- At scale: hundreds of dollars/month in unexpected Firestore bills.
-- Real-time listeners on leaderboards compound the problem -- every write triggers reads for ALL listeners.
+**What to check:** Verify that `proguard-rules.pro` in `android/app/` includes AdMob keep rules. The `@capacitor-community/admob` plugin should ship consumer ProGuard rules automatically, but this is not guaranteed to cover all UMP SDK classes.
 
-**Prevention:**
-1. **Always use `.limit(10)` or `.limit(25)`** on leaderboard queries. Never fetch all entries.
-2. **Cache aggressively.** Use React state or a simple in-memory cache with a 5-minute TTL. Leaderboards do not need to be real-time.
-3. **Do NOT use `onSnapshot` for leaderboards.** Use `getDocs` with manual refresh (pull-to-refresh or a "Refresh" button).
-4. **Denormalize a "top scores" document.** Store the top 10 scores for each puzzle in a SINGLE document. Reading 1 document = 1 read, instead of querying and reading 10+ documents.
-5. **Batch leaderboard updates server-side** using Cloud Functions triggered on score writes.
-6. **Structure Firestore as:** `puzzles/{puzzleId}/topScores` (single document with top 10 array) rather than `leaderboard/{puzzleId}/entries/{entryId}` (N documents).
-
-**Detection:** Monitor Firestore usage dashboard from day one. Set up billing alerts at $1, $5, $25.
-
+**Minimum rules to verify are present:**
+```proguard
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.android.ump.** { *; }
+-dontwarn com.google.android.gms.**
 ```
-// EXPENSIVE: N reads per leaderboard view
-collection("leaderboard").where("puzzleId", "==", id).orderBy("moves").limit(10)
 
-// CHEAP: 1 read per leaderboard view
-doc("puzzles/" + puzzleId + "/topScores")  // single doc with array of top 10
-```
+**Prevention:** After building a release AAB, test it via the internal testing track on a real Android device before promoting to production. Many ProGuard-caused crashes only appear in actual release builds.
+
+This project already has a `proguard-rules.pro` file and an existing suppress rule for R8 missing-class errors (evidenced by a prior commit: "fix(android): suppress R8 missing-class errors for unused auth providers"). Check that file and add AdMob-specific keeps to it.
 
 ---
 
-### Pitfall 3: Puzzle Solvability -- Shipping Unsolvable Puzzles
+## Moderate Pitfalls (Revenue or UX Impact)
 
-**What goes wrong:** A puzzle in the set of 80+ is actually unsolvable, or becomes unsolvable due to a data entry error (vehicle placed wrong, exit blocked permanently). Players get stuck forever with no recourse (no hint system).
+---
 
-**Why it happens:**
-- Manual puzzle creation without automated validation.
-- Off-by-one errors in puzzle data (vehicle at row 2 instead of row 3).
-- Copy-paste errors when encoding 80+ puzzles.
-- Assuming a puzzle is solvable because it "looks solvable" without running a solver.
-- Editing a puzzle after validation without re-validating.
+### Pitfall M1: Play Store Data Safety Section Not Updated for AdMob
 
-**Consequences:**
-- Player frustration and app abandonment.
-- Negative reviews.
-- No hint system means there is NO fallback -- the player is simply stuck.
-- Leaderboard for that puzzle will be empty, which looks broken.
+**Severity:** MODERATE — Play Console will flag the app for policy review; update can be rejected.
+
+**What goes wrong:** Adding AdMob to an existing app means additional user data is now collected and shared (device identifiers, advertising IDs, IP address, interaction data). The Data Safety section filled out for v1.0 does not cover these. Google can reject the update or add a warning to the store listing if declared data practices do not match what the SDK actually does.
+
+**What AdMob's SDK automatically collects and shares (must be declared):**
+- Advertising ID (collected, shared for advertising purposes)
+- Device identifiers
+- IP address (for fraud prevention)
+- User product interactions (ad click/view events)
+
+**Where to update in Play Console:**
+`Play Console -> App content -> Data safety -> Edit -> Add data types`
+
+Google provides a specific guidance page for this: `developers.google.com/admob/android/privacy/play-data-disclosure`
+
+**Additionally:** The store listing "Contains ads" checkbox must be ticked. Go to `Play Console -> Store presence -> Store listing` and enable "Contains ads." This adds the "Contains ads" label to the Play Store listing — users with existing installs will see this on the next update.
+
+**Phase:** Complete Data Safety and Store Listing updates in Play Console BEFORE submitting the APK/AAB update.
+
+---
+
+### Pitfall M2: Privacy Policy Not Updated to Declare Ad Data Collection
+
+**Severity:** MODERATE — Policy violation; existing privacy policy URL is already in the Play Console listing.
+
+**What goes wrong:** This project already has a privacy policy (noted in commit history: "docs: add privacy policy page for Google Play submission"). That policy was written before ads were added. It likely does not disclose:
+- That third-party ad networks (Google AdMob) collect advertising identifiers.
+- How to opt out of personalized ads.
+- That a consent dialog is shown to EU/EEA users.
+
+AdMob's policies require these disclosures. The existing privacy policy URL is already linked in the Play Console listing — updating the policy document at that same URL is sufficient; no URL change is needed.
+
+**Minimum additions to the privacy policy:**
+1. Statement that the app uses Google AdMob to display ads.
+2. Description of what data AdMob collects (advertising ID, device info).
+3. Link to Google's privacy policy: `https://policies.google.com/privacy`.
+4. Description of the GDPR consent dialog for EU users.
+5. Instructions for opting out of personalized ads (Google Ad Settings link).
+
+**Phase:** Update the privacy policy document before the Play Store update is submitted.
+
+---
+
+### Pitfall M3: Interstitial Preload Timing — Ad Not Ready When Needed
+
+**Severity:** MODERATE — Revenue loss; users experience a noticeable delay before the next puzzle.
+
+**What goes wrong:** Interstitial ads must be preloaded. If `prepareInterstitial()` is called at the moment the win condition triggers, the ad network takes 1-3 seconds to fill the request. During that time either nothing shows (timeout path) or the user waits on a blank screen.
+
+**Correct pattern:**
+```
+Puzzle starts loading
+  -> prepareInterstitial() called immediately (background network request)
+User solves puzzle (takes 30s-3min)
+  -> Ad has had time to load
+  -> On win: showInterstitial() (nearly instant — already loaded)
+  -> Dismiss -> load next puzzle
+```
+
+**Where to wire this in the Rush Hour game:** Call `prepareInterstitial()` in the `GameScreen` component's `useEffect` when a puzzle loads, not when the win is detected.
+
+---
+
+### Pitfall M4: Banner Ad Causes Capacitor WebView Layout Shift
+
+**Severity:** MODERATE — UX regression; game board reflows or gets cut off.
+
+**What goes wrong:** `@capacitor-community/admob` renders the banner ad as a native Android View overlaid on top of the Capacitor WebView. It does NOT inject an HTML element into the DOM. If the React layout uses `height: 100vh` or `height: 100%` on the game board, the native banner will cover the bottom of the board rather than push it up.
 
 **Prevention:**
-1. **Write a BFS/DFS solver and run it against EVERY puzzle at build time.** This is non-negotiable for 80+ puzzles.
-2. Store the optimal solution move count alongside each puzzle (useful for leaderboard calibration and as a sanity check).
-3. Add a build-time or CI test: `puzzles.forEach(p => assert(solver.solve(p) !== null))`.
-4. Include the minimum moves in the puzzle metadata so leaderboard scores can be compared against the theoretical optimum.
-5. Version puzzle data and re-validate on any change.
+- The plugin fires `BANNER_AD_LOADED` and `BANNER_AD_SIZE_CHANGED` events with the banner's pixel height.
+- Listen for these events and add a CSS `padding-bottom` or `margin-bottom` to the game container equal to the reported height.
+- Test on a 320px-wide device — the board is already tight at minimum supported width.
 
-**Detection:** A puzzle with zero leaderboard entries after launch is likely unsolvable or has a data error.
+---
 
+### Pitfall M5: Capacitor Plugin Version Mismatch with Capacitor 8
+
+**Severity:** MODERATE — Build failure or runtime errors if wrong plugin version is used.
+
+**Context:** `@capacitor-community/admob` versions map to Capacitor major versions. Capacitor 8 is relatively recent; community plugin support for it may lag. Using a plugin version built for Capacitor 6 or 7 against a Capacitor 8 project can cause Gradle compilation errors or JavaScript bridge registration failures.
+
+**How to verify compatibility:** Check the plugin's `package.json` `peerDependencies` for `@capacitor/core: "^8.0.0"`. If the latest stable release only lists `^6.0.0` or `^7.0.0`, options are:
+1. Use the latest pre-release/RC version if it explicitly targets Capacitor 8.
+2. Consider `@capgo/capacitor-admob` as an alternative — it has more frequent releases and may have earlier Capacitor 8 support.
+
+**Check at install time:** Run `npx cap doctor` before and after adding the plugin.
+
+---
+
+## Minor Pitfalls (Developer Friction, Not Revenue/Policy Risk)
+
+---
+
+### Pitfall L1: Forgetting `npx cap sync` After Installing the Plugin
+
+**What goes wrong:** `npm install @capacitor-community/admob` updates `package.json` but does NOT copy the native Android plugin code to `android/`. The app builds without the plugin code and JavaScript calls silently fail — no crash, no ads, no errors in Chrome DevTools.
+
+**Prevention:** Always run `npx cap sync android` after any `npm install` involving a Capacitor plugin.
+
+---
+
+### Pitfall L2: Testing Consent Flow Without debugGeography
+
+**What goes wrong:** UMP consent forms are only shown to users in EEA/UK by default. A developer in a non-EEA country will never see the consent form during testing, assuming it's working, but EU users see an app that shows personalized ads without consent.
+
+**Prevention:** Add this during development:
 ```typescript
-// Build-time validation script
-import { puzzles } from './puzzleData';
-import { solve } from './solver';
-
-puzzles.forEach((puzzle, i) => {
-  const solution = solve(puzzle);
-  if (!solution) {
-    throw new Error(`Puzzle ${i} (${puzzle.id}) is UNSOLVABLE`);
-  }
-  console.log(`Puzzle ${i}: solvable in ${solution.moves} moves`);
+await AdMob.initialize({
+  requestTrackingAuthorization: false,
+  testingDevices: ['YOUR_DEVICE_ID'],
+  debugGeography: 1, // 1 = EEA, forces consent form to appear
 });
 ```
+Remove `debugGeography` before the production build.
 
 ---
 
-### Pitfall 4: Leaderboard Cheating -- Impossible Scores
+### Pitfall L3: versionCode Not Bumped for Play Store Update
 
-**What goes wrong:** Players submit leaderboard entries with impossible move counts (0 moves, 1 move on an expert puzzle) or impossibly fast times (0.1 seconds). Without validation, the leaderboard becomes meaningless.
+**What goes wrong:** The current `versionCode` in `android/app/build.gradle` is `1` (matching v1.0). Play Store requires each upload to have a strictly higher `versionCode`. Uploading the same `versionCode` causes immediate rejection in the Play Console upload step.
 
-**Why it happens:**
-- Score submission is a simple Firestore write from the client.
-- No server-side validation of whether the score is achievable.
-- Browser DevTools can intercept and modify the Firestore write payload.
-- Replay attacks: submitting the same score multiple times.
-- Time manipulation: pausing the browser timer, modifying Date.now().
-
-**Consequences:**
-- Legitimate players see impossible scores and lose motivation.
-- Leaderboard credibility destroyed.
-- "First place" becomes whoever cheats the most, not who plays the best.
-
-**Prevention:**
-1. **Server-side validation via Cloud Functions.** Do NOT write directly to the leaderboard from the client. Write to a `pendingScores` collection; a Cloud Function validates and promotes to `leaderboard`.
-2. **Validate move count against the known minimum.** If optimal is 12 moves, reject anything below 12.
-3. **Validate time against a reasonable minimum.** Even the fastest solver needs ~0.5 seconds per move. Reject `time < minMoves * 0.3`.
-4. **Store and validate the move sequence** (not just the count). The Cloud Function can replay the moves against the puzzle state to verify legitimacy.
-5. **Rate limit submissions.** One score per puzzle per user per 10 seconds.
-6. **Firestore Security Rules** should prevent direct writes to leaderboard collections.
-
-**Detection:** Monitor for scores below the known optimal move count. Alert on times that are physically impossible.
-
-```
-// Firestore security rules
-match /leaderboard/{puzzleId}/entries/{entryId} {
-  allow read: if true;
-  allow write: if false;  // Only Cloud Functions can write
-}
-
-match /pendingScores/{scoreId} {
-  allow create: if request.auth != null
-    && request.resource.data.moves >= 1
-    && request.resource.data.userId == request.auth.uid;
-  allow read, update, delete: if false;
-}
-```
+**Prevention:** Bump `versionCode` to `2` and `versionName` to `"1.1"` in `build.gradle` before building the release AAB.
 
 ---
 
-### Pitfall 5: Race Conditions in Firestore Leaderboard Writes
+### Pitfall L4: Banner Ad Not Removed on Screen Navigation
 
-**What goes wrong:** Two players submit scores simultaneously. Both read the current top-10, both determine they qualify, both write. One overwrites the other. Or: a player's personal best is checked and updated non-atomically, allowing duplicate entries.
+**What goes wrong:** If `showBanner()` is called when the GameScreen mounts and `removeBanner()` is not called when it unmounts, the native banner overlay persists on top of the MainMenu, PuzzleSelect, and WinModal screens. It is a native view — React Router navigation does not remove it.
 
-**Why it happens:**
-- Firestore operations are not automatically serialized.
-- Read-then-write patterns without transactions.
-- Cloud Functions can execute concurrently for the same puzzle.
-- The "denormalized top scores" document is a hotspot -- multiple concurrent writes to the same document.
-
-**Consequences:**
-- Lost leaderboard entries.
-- Duplicate entries for the same player.
-- Corrupted top-10 arrays (wrong length, missing entries).
-- Inconsistent state between the detailed entries and the denormalized summary.
-
-**Prevention:**
-1. **Use Firestore transactions** for all leaderboard updates. Read current state and write new state atomically.
-2. **Use the player's UID as the document ID** in per-puzzle collections to prevent duplicates: `leaderboard/{puzzleId}/entries/{uid}`.
-3. For the denormalized top-scores document, use a transaction that reads the current array, inserts the new score in sorted order, trims to top 10, and writes back.
-4. **Idempotent Cloud Functions:** Design the function so running it twice with the same input produces the same result.
-5. Consider using Firestore's `FieldValue.arrayUnion` where appropriate, but note it does NOT handle sorted insertion -- use transactions instead.
-
-**Detection:** Monitor for duplicate player entries in leaderboards. Check that top-10 arrays always have exactly <= 10 entries.
-
+**Prevention:** Return a cleanup function from the `useEffect` that calls `AdMob.removeBanner()`:
 ```typescript
-// Cloud Function: atomic leaderboard update
-await firestore.runTransaction(async (txn) => {
-  const topRef = firestore.doc(`puzzles/${puzzleId}/topScores`);
-  const topDoc = await txn.get(topRef);
-  const scores = topDoc.exists ? topDoc.data().scores : [];
-
-  // Check if player already has a better score
-  const existing = scores.find(s => s.uid === uid);
-  if (existing && existing.moves <= newMoves) return; // Already better
-
-  // Remove old entry if exists, add new, sort, trim
-  const updated = scores
-    .filter(s => s.uid !== uid)
-    .concat({ uid, moves: newMoves, time: newTime, displayName })
-    .sort((a, b) => a.moves - b.moves || a.time - b.time)
-    .slice(0, 10);
-
-  txn.set(topRef, { scores: updated });
-});
-```
-
----
-
-## Moderate Pitfalls
-
----
-
-### Pitfall 6: Browser Audio Autoplay Policy Blocking Sound Effects
-
-**What goes wrong:** Sound effects don't play on first interaction. The car slide sound, level start sound, or win celebration is silently blocked by the browser. No error is visible to the user -- sounds just don't work.
-
-**Why it happens:**
-- All modern browsers (Chrome, Safari, Firefox, Edge) block `AudioContext` and `Audio.play()` until after a user gesture (click, tap, keypress).
-- Developers test with DevTools open (which can have different autoplay policies) or after already interacting with the page.
-- Creating `AudioContext` on page load instead of on first user interaction.
-- Calling `.play()` on an `<audio>` element that hasn't been "unlocked" by a user gesture.
-
-**Prevention:**
-1. **Initialize AudioContext on the FIRST user click/tap**, not on page load.
-2. Use a "warm-up" pattern: on first user interaction anywhere on the page, create the AudioContext and play a silent buffer to unlock it.
-3. **Always handle the `.play()` promise rejection** -- `audio.play().catch(() => {})` at minimum, but better to set a flag and retry on next user gesture.
-4. Use the Web Audio API (`AudioContext` + `AudioBuffer`) instead of `<audio>` elements for low-latency game sounds.
-5. Pre-decode audio buffers after unlocking the AudioContext so sounds play instantly when needed.
-6. Provide a visible mute/unmute toggle so users have control and can see audio state.
-
-**Detection:** Test on mobile Safari (strictest autoplay policy). Test in a fresh incognito window with no prior interactions.
-
-```typescript
-// Audio manager with user-gesture unlock
-class SoundManager {
-  private ctx: AudioContext | null = null;
-  private buffers: Map<string, AudioBuffer> = new Map();
-  private unlocked = false;
-
-  async unlock() {
-    if (this.unlocked) return;
-    this.ctx = new AudioContext();
-    // Play silent buffer to unlock
-    const buffer = this.ctx.createBuffer(1, 1, 22050);
-    const source = this.ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(this.ctx.destination);
-    source.start(0);
-    this.unlocked = true;
-    // Now pre-load actual sounds
-    await this.preloadSounds();
-  }
-
-  // Call this from your app's first click handler
-}
-```
-
----
-
-### Pitfall 7: SVG Rendering Performance with Many Animated Vehicles
-
-**What goes wrong:** Animations stutter or drop frames, especially on mobile devices. Dragging a car feels laggy. The board feels unresponsive during slide animations.
-
-**Why it happens:**
-- SVG re-renders trigger full DOM layout recalculations.
-- React re-rendering SVG elements on every mouse/touch move event (60+ times/second during drag).
-- Complex SVG paths for vehicle art (gradients, shadows, details) multiply render cost.
-- CSS transitions on SVG `transform` properties can trigger layout thrashing.
-- Mobile devices have weaker GPUs and less memory for SVG compositing.
-
-**Consequences:**
-- Laggy drag feel ruins the core gameplay experience.
-- Animation jank makes the game feel unpolished.
-- High battery drain on mobile from constant re-paints.
-
-**Prevention:**
-1. **Use CSS `transform: translate()` for all vehicle movement**, not SVG `x`/`y` attributes. Transforms are GPU-composited and skip layout.
-2. **Use `will-change: transform`** on vehicle elements to promote them to their own compositor layer.
-3. **Throttle drag events** to requestAnimationFrame. Do NOT update React state on every `mousemove` -- use a ref to store position and update via `requestAnimationFrame`.
-4. **Keep SVG art simple.** Flat colors, minimal gradients, no filters (`<feGaussianBlur>`, `<feDropShadow>` are expensive). Aim for < 20 SVG nodes per vehicle.
-5. **Avoid React re-renders during drag.** Store drag position in a ref, manipulate the DOM element directly via `element.style.transform`, and only update React state on drag END.
-6. **Consider CSS-based vehicles** (div + border-radius + background) instead of SVG for simpler rendering. Reserve SVG for decorative details only.
-7. Use `React.memo` on vehicle components to prevent re-rendering vehicles that haven't moved.
-
-**Detection:** Profile with Chrome DevTools Performance tab. Look for long "Recalculate Style" and "Layout" entries during drag. Test on a low-end Android phone.
-
-```typescript
-// WRONG: React state update on every mouse move
-const onMouseMove = (e) => {
-  setVehiclePosition({ x: e.clientX, y: e.clientY }); // 60 re-renders/sec
-};
-
-// RIGHT: Direct DOM manipulation during drag, React update on drop
-const dragRef = useRef({ x: 0, y: 0 });
-const elementRef = useRef<HTMLDivElement>(null);
-
-const onMouseMove = useCallback((e) => {
-  dragRef.current.x = e.clientX;
-  requestAnimationFrame(() => {
-    if (elementRef.current) {
-      elementRef.current.style.transform =
-        `translate(${dragRef.current.x}px, ${dragRef.current.y}px)`;
-    }
-  });
+useEffect(() => {
+  AdMob.showBanner({ adId: BANNER_ID, adSize: BannerAdSize.ADAPTIVE_BANNER });
+  return () => { AdMob.removeBanner(); };
 }, []);
 ```
 
 ---
 
-### Pitfall 8: Mobile Touch Handling Conflicts with Scroll and Zoom
-
-**What goes wrong:** On mobile, dragging a vehicle triggers page scroll or pinch-zoom instead of (or in addition to) moving the vehicle. Or, after implementing `preventDefault()` on touch events, the user can no longer scroll the page at all.
-
-**Why it happens:**
-- Touch events (`touchstart`, `touchmove`) propagate to the browser's scroll/zoom handlers.
-- Using `preventDefault()` broadly kills all scrolling, not just on the game board.
-- React's synthetic events and passive event listeners complicate touch handling.
-- iOS Safari has unique touch-handling quirks (300ms tap delay, rubber-band scrolling).
-- The 6x6 grid may not fill the viewport, so users need to scroll to see content above/below.
-
-**Prevention:**
-1. **Call `preventDefault()` ONLY on touch events that originate on the game board**, not globally.
-2. Set `touch-action: none` CSS on the game board container (not on `body`). This tells the browser not to handle touches on that element as scroll/zoom.
-3. For elements outside the board, ensure `touch-action: auto` (the default).
-4. Use `{ passive: false }` when adding touch event listeners that call `preventDefault()`.
-5. Add `<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">` to prevent pinch-zoom on the game board (but be aware of accessibility implications).
-6. Test on both iOS Safari and Android Chrome -- they handle touch events differently.
-
-**Detection:** Test on a real mobile device (not just Chrome DevTools device simulation). Try scrolling the page while touching the game board. Try pinch-zooming on the board.
-
-```css
-/* Apply ONLY to the game board */
-.game-board {
-  touch-action: none;  /* Prevents scroll/zoom on this element */
-  user-select: none;   /* Prevents text selection during drag */
-  -webkit-user-select: none;
-}
-```
-
----
-
-### Pitfall 9: Responsive Layout -- 6x6 Grid Sizing Across Devices
-
-**What goes wrong:** The 6x6 grid is too small on mobile (can't tap vehicles accurately), too large on desktop (wastes space), or doesn't maintain its square aspect ratio. Vehicles become misaligned with grid cells at certain viewport sizes.
-
-**Why it happens:**
-- Using fixed pixel sizes that don't adapt to viewport.
-- Using percentage-based sizing without maintaining aspect ratio.
-- Grid cell size calculations produce fractional pixels, causing sub-pixel rendering misalignment.
-- Not accounting for the status bar, navigation bar, or on-screen keyboard on mobile.
-
-**Prevention:**
-1. **Use `min(90vw, 90vh, 500px)`** for the board size. This ensures it fits in the viewport, stays square, and has a maximum size on desktop.
-2. **Use CSS Grid with `1fr` cells** so cells divide evenly. `grid-template: repeat(6, 1fr) / repeat(6, 1fr)`.
-3. **Round cell sizes to whole pixels** when calculating vehicle positions to avoid sub-pixel gaps.
-4. Use `aspect-ratio: 1` on the board container for guaranteed squareness.
-5. Use `dvh` (dynamic viewport height) instead of `vh` on mobile to account for browser chrome.
-6. Test at: 320px wide (iPhone SE), 375px (iPhone), 768px (iPad), 1920px (desktop).
-
-**Detection:** Visual inspection at multiple viewport sizes. Look for 1px gaps between vehicles and grid lines. Check that tapping a vehicle on mobile reliably selects it.
-
-```css
-.game-board {
-  --board-size: min(90vw, 90dvh, 500px);
-  width: var(--board-size);
-  height: var(--board-size);
-  display: grid;
-  grid-template: repeat(6, 1fr) / repeat(6, 1fr);
-  aspect-ratio: 1;
-}
-
-.vehicle {
-  /* Use grid placement, not absolute positioning */
-  grid-row: var(--vehicle-row) / span var(--vehicle-row-span);
-  grid-column: var(--vehicle-col) / span var(--vehicle-col-span);
-}
-```
-
----
-
-### Pitfall 10: Drag-to-Slide vs Click-to-Slide Input Model Confusion
-
-**What goes wrong:** The game implements drag-based movement, but users expect click-based (click vehicle, click destination). Or vice versa. Or the drag doesn't snap to grid cells properly, leaving vehicles between cells.
-
-**Why it happens:**
-- Rush Hour is a physical board game with a slide mechanic, but digital implementations vary.
-- Drag-based movement is intuitive but hard to implement correctly (collision detection during drag, snap-to-grid on release, axis locking).
-- Click-based is simpler to implement but less satisfying.
-- Not locking the drag axis to the vehicle's orientation (allowing diagonal drag of a horizontal car).
-
-**Prevention:**
-1. **Use constrained drag.** When the user starts dragging a vehicle, lock movement to the vehicle's orientation axis immediately.
-2. **Snap to grid on drag end.** Calculate the nearest valid grid position (considering collisions) and animate to it.
-3. **Show valid movement range** during drag (e.g., highlight cells the vehicle can reach).
-4. **During drag, continuously enforce collision bounds** -- the vehicle should stop at the nearest blocker, not pass through.
-5. Consider supporting BOTH: drag for power users, click/tap on vehicle then tap on valid cell for casual users.
-6. Provide visual feedback during drag: slight scale-up, shadow, or highlighting.
-
-**Detection:** Watch a non-developer use the game for the first time. Note where they hesitate or try an unexpected interaction.
-
----
-
-## Minor Pitfalls
-
----
-
-### Pitfall 11: Firebase Auth Session Persistence Confusion
-
-**What goes wrong:** Users lose their authentication state unexpectedly (after page refresh, between sessions, or across tabs). Or conversely, auth state persists in shared/public computers when it shouldn't.
-
-**Prevention:**
-1. Use `browserLocalPersistence` for personal devices (survives page refresh).
-2. Explicitly set persistence: `setPersistence(auth, browserLocalPersistence)`.
-3. Handle the auth state loading period -- show a loading state while `onAuthStateChanged` fires for the first time.
-4. Offer anonymous auth as the default (zero friction) with optional account linking later.
-5. If using anonymous auth, warn that clearing browser data loses the account.
-
----
-
-### Pitfall 12: Puzzle Data Format Fragility
-
-**What goes wrong:** Puzzle data is encoded as a string or compact format that is error-prone to edit. A single character error in puzzle data makes a puzzle unsolvable or crashes the parser.
-
-**Prevention:**
-1. Use a strongly-typed JSON format, not a compact string encoding.
-2. Add TypeScript types for puzzle data and validate at load time.
-3. Build a puzzle editor/visualizer tool (even a simple one) for creating and verifying puzzles.
-4. Add schema validation for puzzle data (e.g., with Zod).
-5. Validate invariants: exactly one red car, red car on row 3 (0-indexed: row 2), red car is horizontal, no overlapping vehicles, all vehicles within bounds.
-
-```typescript
-// Puzzle data schema (Zod example)
-const VehicleSchema = z.object({
-  id: z.string(),
-  type: z.enum(['car', 'truck']),
-  orientation: z.enum(['H', 'V']),
-  row: z.number().min(0).max(5),
-  col: z.number().min(0).max(5),
-  length: z.number().min(2).max(3),
-  isTarget: z.boolean().default(false),
-});
-
-const PuzzleSchema = z.object({
-  id: z.string(),
-  difficulty: z.enum(['beginner', 'intermediate', 'advanced', 'expert']),
-  vehicles: z.array(VehicleSchema).refine(
-    (vehicles) => vehicles.filter(v => v.isTarget).length === 1,
-    "Exactly one target vehicle required"
-  ),
-  minMoves: z.number().positive(),
-});
-```
-
----
-
-### Pitfall 13: Timer Manipulation and Inconsistent Timing
-
-**What goes wrong:** The game timer uses `Date.now()` or `setInterval`, which can be manipulated via DevTools, system clock changes, or simply pausing/backgrounding the tab (which throttles `setInterval`).
-
-**Prevention:**
-1. Use `performance.now()` for relative timing (not affected by system clock changes).
-2. Track elapsed time on the server side as well (record start and end timestamps in Firestore).
-3. Handle page visibility changes: pause the timer when the tab is hidden (`document.visibilitychange` event).
-4. For leaderboard timing, the Cloud Function should validate that `endTime - startTime` matches the claimed duration (within a tolerance).
-5. Accept that client-side timing will never be perfectly cheat-proof -- focus on making obvious cheating detectable.
-
----
-
-### Pitfall 14: Win Detection Edge Case -- Partial Exit
-
-**What goes wrong:** The win condition checks if the red car is at column 4 (for a length-2 car exiting right on a 6-wide grid), but the actual win is when the car reaches the exit. Off-by-one errors cause the game to either trigger win too early or not at all.
-
-**Prevention:**
-1. Define win condition clearly: the target car's leading edge reaches the exit cell. For a horizontal car exiting right: `car.col + car.length - 1 >= 5` (rightmost column, 0-indexed).
-2. OR model the exit as column 6 (off-grid) and allow the target car to slide to `col = 5` (its front at position 6). This is cleaner conceptually.
-3. Add an animated "drive off the board" effect on win rather than just stopping at the edge.
-4. Test win detection with the target car at every possible column position.
-
----
-
-### Pitfall 15: Undo/Reset State Management Complexity
-
-**What goes wrong:** Implementing undo (step back one move) and reset (return to initial state) seems trivial but introduces state management bugs. Undo after undo after undo can corrupt state. Reset doesn't fully restore the original puzzle. Move counter doesn't decrement on undo (or decrements below zero).
-
-**Prevention:**
-1. Store the full move history as an array of `{ vehicleId, fromPos, toPos }`.
-2. Undo = pop the last move and reverse it. Reset = restore the original puzzle state (stored as a constant).
-3. **Keep the original puzzle state immutable** -- deep clone it at puzzle load, never mutate it.
-4. Decide upfront whether undo increments the move counter (most implementations: undo does NOT decrement the counter, preventing undo-abuse for better scores). Document this decision.
-5. If undo doesn't affect the counter, disable undo on leaderboard-submitted runs, OR count total moves including undos.
-
----
-
-### Pitfall 16: Firebase Security Rules -- Overly Permissive Defaults
-
-**What goes wrong:** Default Firestore rules allow anyone to read/write anything. Developers forget to lock down rules before launch. Any user can read all other users' data, delete leaderboard entries, or write arbitrary data.
-
-**Prevention:**
-1. **Start with deny-all rules** and explicitly open only what's needed.
-2. Leaderboard write access: ONLY via Cloud Functions (never direct client writes).
-3. User profile data: read by anyone, write only by the owner.
-4. Puzzle data: read by anyone, write by nobody (managed via deployment).
-5. Test security rules with the Firebase Emulator Suite before deploying.
-
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Default: deny all
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // Puzzles: public read, no client write
-    match /puzzles/{puzzleId} {
-      allow read: if true;
-      allow write: if false;
-    }
-
-    // User profiles: owner can write, anyone can read display name
-    match /users/{userId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Pending scores: authenticated users can create their own
-    match /pendingScores/{scoreId} {
-      allow create: if request.auth != null
-        && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if false;
-    }
-
-    // Leaderboard: public read, only Cloud Functions write
-    match /leaderboard/{puzzleId}/{document=**} {
-      allow read: if true;
-      allow write: if false;
-    }
-  }
-}
-```
-
----
-
-## Phase-Specific Warnings
+## Phase-Specific Warning Map
 
 | Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| Core grid + movement | Collision detection bugs (Pitfall 1) | Comprehensive unit tests with edge cases; build occupancy grid as single source of truth |
-| Vehicle rendering | SVG performance (Pitfall 7) | Use CSS transforms, not SVG attributes; profile on mobile early |
-| Puzzle data | Unsolvable puzzles (Pitfall 3) | Build solver FIRST; validate every puzzle at build time |
-| Drag interaction | Touch conflicts on mobile (Pitfall 8) | Set `touch-action: none` on board; test on real devices early |
-| Firebase integration | Cost explosion (Pitfall 2) | Denormalize leaderboard into single doc; cache client-side; set billing alerts |
-| Leaderboard | Cheating + race conditions (Pitfalls 4, 5) | Cloud Functions for writes; transactions; validate against known minimums |
-| Sound effects | Autoplay blocking (Pitfall 6) | Unlock AudioContext on first user gesture; handle play() rejections |
-| Mobile layout | Grid sizing issues (Pitfall 9) | Use CSS min() + aspect-ratio; test on real devices at all breakpoints |
-| Auth + security | Permissive rules (Pitfall 16) | Start with deny-all; lock down before any public deployment |
-| Polish + UX | Timer cheating (Pitfall 13) | Server-side timing validation; handle tab visibility changes |
+|---|---|---|
+| Initial plugin install + Android sync | C3 (manifest merge), H3 (Gradle conflict), L1 (forgot cap sync) | Build immediately after sync; have the manifest fix ready |
+| AndroidManifest.xml update | C1 (missing App ID), C3 (missing xmlns:tools) | Add meta-data tag and tools namespace in same commit |
+| Ad unit ID setup | C2 (prod IDs in dev), L2 (no debugGeography) | Env variable separation from day one |
+| Consent / UMP wiring | C4 (ads before consent), L2 (no EEA simulation) | Test with debugGeography=1; block ad show until consent resolves |
+| Banner layout integration | H2 (adjacent to game board), M4 (layout shift) | Add padding-bottom via BANNER_AD_LOADED event |
+| Interstitial trigger point | H1 (wrong trigger point), M3 (not preloaded) | Preload on puzzle start; show on win-to-next transition only |
+| Release build | H4 (R8 strips classes) | Test release AAB via internal testing track before production |
+| Play Store update submission | M1 (data safety), M2 (privacy policy), L3 (versionCode) | Complete Play Console checklist below before uploading AAB |
 
 ---
 
-## Risk Matrix Summary
+## Play Store Update Checklist (Before Submitting v1.1)
 
-| Pitfall | Severity | Likelihood | Impact if Missed | Phase |
-|---------|----------|------------|------------------|-------|
-| Collision detection | CRITICAL | HIGH | Broken gameplay | Core |
-| Firebase costs | CRITICAL | HIGH | Unexpected bills | Firebase |
-| Unsolvable puzzles | CRITICAL | MEDIUM | Player frustration, no recovery | Data |
-| Leaderboard cheating | CRITICAL | HIGH | Destroyed competitive value | Firebase |
-| Race conditions | CRITICAL | MEDIUM | Data corruption | Firebase |
-| Audio autoplay | MODERATE | HIGH | Silent game on first play | Polish |
-| SVG performance | MODERATE | MEDIUM | Laggy drag on mobile | Rendering |
-| Touch conflicts | MODERATE | HIGH | Unusable on mobile | Mobile |
-| Grid responsiveness | MODERATE | MEDIUM | Misaligned visuals | Layout |
-| Input model confusion | MODERATE | LOW | User confusion | UX |
-| Auth persistence | MINOR | LOW | Logged-out users | Auth |
-| Puzzle data format | MINOR | MEDIUM | Data entry errors | Data |
-| Timer manipulation | MINOR | MEDIUM | Unfair leaderboard | Firebase |
-| Win detection | MINOR | LOW | Game-breaking bug | Core |
-| Undo state mgmt | MINOR | MEDIUM | Corrupted game state | Core |
-| Security rules | CRITICAL | MEDIUM | Data breach / vandalism | Firebase |
+Complete ALL of these before uploading the release AAB to Play Console.
+
+### Code / Build
+- [ ] `versionCode` incremented to `2`, `versionName` set to `"1.1"` in `android/app/build.gradle`
+- [ ] `com.google.android.gms.ads.APPLICATION_ID` `<meta-data>` added to AndroidManifest.xml with production App ID
+- [ ] AD_SERVICES_CONFIG manifest merge conflict resolved (if encountered)
+- [ ] Production ad unit IDs in place (not Google's test IDs)
+- [ ] `debugGeography` removed from `AdMob.initialize()` call
+- [ ] `testingDevices` list removed or guarded to debug builds only
+- [ ] Release AAB tested on a real Android device via internal testing track (not just debug build)
+- [ ] ProGuard/R8 keep rules verified for AdMob and UMP SDK classes
+
+### AdMob Console
+- [ ] AdMob App ID created and linked to the Play Store app
+- [ ] Banner ad unit created and ID recorded
+- [ ] Interstitial ad unit created and ID recorded
+- [ ] App verified in AdMob console (requires existing Play Store listing — app is already published, so this is fast)
+
+### Play Console — Store Listing
+- [ ] "Contains ads" checkbox ticked in Store Listing
+- [ ] App description updated to mention ads if appropriate
+
+### Play Console — App Content / Data Safety
+- [ ] Data Safety section updated to declare advertising ID collection
+- [ ] Data Safety section updated to declare data shared with Google (advertising, analytics)
+- [ ] "Data encrypted in transit" marked Yes
+- [ ] "Users can request data deletion" answered appropriately
+
+### Privacy Policy
+- [ ] Privacy policy document updated to disclose AdMob data collection
+- [ ] Google AdMob / Google's privacy policy linked from your privacy policy
+- [ ] GDPR consent mechanism described in the privacy policy
+- [ ] Opt-out instructions included (Google Ad Settings)
+- [ ] Updated policy live at the same URL already in Play Console (no URL change needed)
+
+### GDPR / Consent
+- [ ] UMP consent form created in AdMob console (under Privacy and Messaging)
+- [ ] Consent flow tested in EEA geography simulation (`debugGeography: 1`)
+- [ ] Consent revocation accessible from app UI (Privacy / Settings option)
+- [ ] No ads shown before consent is resolved on first launch
 
 ---
 
 ## Sources
 
-- Domain expertise in React game development, Firebase cost modeling, Web Audio API restrictions, SVG performance characteristics, and mobile touch event handling.
-- Confidence level: MEDIUM overall. WebSearch was unavailable for verification against current (2026) documentation. Core claims about browser autoplay policies, Firestore pricing model, SVG rendering performance, and touch event handling are well-established patterns unlikely to have changed, but specific API details should be verified against current docs during implementation.
+- [Set up Google Mobile Ads SDK | Android](https://developers.google.com/admob/android/quick-start)
+- [Set up UMP SDK | Android](https://developers.google.com/admob/android/privacy)
+- [Disallowed interstitial implementations](https://support.google.com/admob/answer/6201362)
+- [Recommended interstitial implementations](https://support.google.com/admob/answer/6201350)
+- [Discouraged banner implementations](https://support.google.com/admob/answer/6275345)
+- [AdMob behavioral policies](https://support.google.com/admob/answer/2753860)
+- [Invalid activity: account suspension](https://support.google.com/admob/answer/6213019)
+- [Enable test ads | Android](https://developers.google.com/admob/android/test-ads)
+- [Google Play data disclosure for AdMob](https://developers.google.com/admob/android/privacy/play-data-disclosure)
+- [Provide information for Google Play's Data safety section](https://support.google.com/googleplay/android-developer/answer/10787469)
+- [Google Play Ads policy](https://support.google.com/googleplay/android-developer/answer/9857753)
+- [Understanding Google Play's Better Ads Experiences policy](https://support.google.com/googleplay/android-developer/answer/12271244)
+- [capacitor-community/admob GitHub](https://github.com/capacitor-community/admob)
+- [Firebase + AdMob AD_SERVICES_CONFIG conflict fix](https://andresand.medium.com/fix-issue-with-the-dependencies-admob-and-firebase-d3747fcf123e)
+- [Firebase dependency conflict issue #216](https://github.com/capacitor-community/admob/issues/216)
+- [UMP consent implementation issue #273](https://github.com/capacitor-community/admob/issues/273)
+- [Change to Android UMP SDK consent behavior February 2025](https://groups.google.com/g/google-admob-ads-sdk/c/JVVp2_LRtK0)
