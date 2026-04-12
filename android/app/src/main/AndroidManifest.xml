@@ -7,6 +7,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+            <!-- AdMob App ID meta-data (SETUP-02). Value lives in strings.xml for clean diffs. -->
+            <meta-data
+                android:name="com.google.android.gms.ads.APPLICATION_ID"
+                android:value="@string/admob_app_id"/>
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:screenOrientation="portrait"
@@ -33,4 +38,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required for Android 13+ (API 33+) advertising ID (SETUP-04). -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
 </manifest>

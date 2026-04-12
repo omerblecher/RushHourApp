@@ -4,4 +4,6 @@
     <string name="title_activity_main">Rush Hour</string>
     <string name="package_name">com.rushhour.puzzle</string>
     <string name="custom_url_scheme">com.rushhour.puzzle</string>
+    <!-- AdMob test App ID (Phase 6, SETUP-02). Phase 10 replaces with real ID. -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
 </resources>
