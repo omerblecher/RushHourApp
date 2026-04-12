@@ -2,19 +2,20 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-22)
+See: .planning/PROJECT.md (updated 2026-04-12)
 
 **Core value:** An accessible, polished Rush Hour puzzle game that feels satisfying to play — drag mechanics, snap animation, and progression feedback keep players coming back
-**Current focus:** v1.0 SHIPPED — planning next milestone (v1.1)
+**Current focus:** v1.1 Ad Monetization — defining requirements
 
 ## Current Position
 
-Milestone: v1.0 Rush Hour MVP — COMPLETE (shipped 2026-02-22)
-Phase: 5 of 5 (Sound and Polish) — COMPLETE
-Status: All 61 requirements satisfied; 5 phases, 20 plans complete; git tagged v1.0
-Last activity: 2026-02-22 — v1.0 milestone archived and tagged
+Milestone: v1.1 Ad Monetization
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-12 — Milestone v1.1 started
 
-Progress: [██████████] 100% (19/19 plans complete)
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 

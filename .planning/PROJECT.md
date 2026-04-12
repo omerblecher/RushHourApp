@@ -1,5 +1,19 @@
 # Rush Hour Puzzle Game
 
+## Current Milestone: v1.1 Ad Monetization
+
+**Goal:** Add Google AdMob banner and interstitial ads to the Android app using the Capacitor AdMob plugin.
+
+**Target features:**
+- `@capacitor-community/admob` installed and wired to Android (Capacitor 8)
+- Banner ad displayed on the game screen
+- Interstitial ad shown between levels (after win, before next puzzle loads)
+- GDPR consent dialog via Google UMP SDK
+- Privacy policy updated to declare ads
+- Play Store listing updated to declare ads
+
+---
+
 ## What This Is
 
 A fully playable Rush Hour sliding puzzle game as a React SPA — players drag (or keyboard-navigate) colorful vehicles on a 6×6 grid to free the red car through the exit. 100 hand-validated puzzles across 4 difficulty levels. Firebase-backed global leaderboards with Google and anonymous authentication. Sound effects, confetti win animation, keyboard accessibility, and a bundle under 200 KB.
@@ -46,7 +60,16 @@ An accessible, polished puzzle game that feels satisfying to play — the drag m
 - ✓ Cross-browser: Chrome, Firefox, Safari, Edge — v1.0
 - ✓ Pure TypeScript engine with zero React/Firebase dependencies — v1.0
 
-### Active (v1.1 candidates)
+### Active (v1.1)
+
+- [ ] `@capacitor-community/admob` installed and configured for Capacitor 8
+- [ ] Banner ad displayed on the game screen
+- [ ] Interstitial ad shown between levels (post-win, pre-next-puzzle)
+- [ ] GDPR/consent dialog via Google UMP SDK
+- [ ] Privacy policy updated to declare ads
+- [ ] Play Store listing updated to declare ads
+
+### Deferred (v1.2 candidates)
 
 - [ ] Real MP3 audio assets (current stubs are silent)
 - [ ] LeaderboardScreen navigable from UI (currently only LeaderboardModal accessible)
