@@ -24,7 +24,7 @@ async function runConsentFlow(): Promise<void> {
 }
 
 export function initAdService(): void {
-  _consentReady = runConsentFlow();
+  _consentReady = AdMob.initialize().then(() => runConsentFlow());
 }
 
 export function waitForConsent(): Promise<void> {

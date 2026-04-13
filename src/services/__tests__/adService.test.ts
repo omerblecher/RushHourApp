@@ -5,7 +5,7 @@ vi.mock('@capacitor-community/admob', () => ({
     requestConsentInfo: vi.fn(),
     showConsentForm: vi.fn(),
     showPrivacyOptionsForm: vi.fn(),
-    initialize: vi.fn(),
+    initialize: vi.fn().mockResolvedValue(undefined),
     showBanner: vi.fn(),
     removeBanner: vi.fn(),
     addListener: vi.fn(),
@@ -156,7 +156,7 @@ describe('adService', () => {
     );
   });
 
-  it('Test 8 (Phase 7 scope guard): adService never calls AdMob.initialize', async () => {
+  it('Test 8 (Phase 8 init gate): initAdService() calls AdMob.initialize exactly once', async () => {
     const { AdMob } = await import('@capacitor-community/admob');
     vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
       status: 1, // NOT_REQUIRED
@@ -169,7 +169,7 @@ describe('adService', () => {
     initAdService();
     await waitForConsent();
 
-    expect(AdMob.initialize).not.toHaveBeenCalled();
+    expect(AdMob.initialize).toHaveBeenCalledTimes(1);
   });
 
   it('Test 9 (BANNER-01): showBanner() calls AdMob.showBanner exactly once after consent resolves', async () => {
