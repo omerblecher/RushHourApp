@@ -24,7 +24,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 
 **Milestone Goal:** Add Google AdMob banner and interstitial ads to the Android app using the Capacitor AdMob plugin, with full GDPR consent compliance and a Play Store update declaring ads.
 
-- [ ] **Phase 6: Android Native Setup** — Install plugin, configure Gradle, add AdMob manifest entries so the app builds and launches without crash
+- [x] **Phase 6: Android Native Setup** — Install plugin, configure Gradle, add AdMob manifest entries so the app builds and launches without crash (completed 2026-04-13)
 - [ ] **Phase 7: GDPR Consent** — Implement adService singleton and UMP consent flow; no ad may load before consent resolves
 - [ ] **Phase 8: Banner Ad** — Display adaptive banner at bottom of GameScreen with lifecycle management and layout padding
 - [ ] **Phase 9: Interstitial Ad** — Preload and show interstitial every 3rd win with timeout guard and auto-reload
@@ -44,7 +44,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   5. Dev builds use Google test App ID and test ad unit IDs; environment variable gate is in place for production IDs
 **Plans**: 2 plans
 - [x] 06-01-PLAN.md — Install AdMob plugin, pin gradle version, update manifest/strings, create env files
-- [ ] 06-02-PLAN.md — Manual Android Studio build + device launch + adb AD_ID verification (checkpoint)
+- [x] 06-02-PLAN.md — Manual Android Studio build + device launch + adb AD_ID verification (checkpoint)
 
 ### Phase 7: GDPR Consent
 **Goal**: Users receive the UMP consent dialog when required, and no ad is loaded or displayed until consent is fully resolved
