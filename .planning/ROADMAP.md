@@ -100,7 +100,10 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   3. The Play Store listing has "Contains ads" checked and the Data Safety section declares advertising ID collection
   4. `versionCode` is 2 and `versionName` is "1.1" in `android/app/build.gradle`
   5. The release AAB passes all checks on the internal testing track before promotion to production
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 10-01-PLAN.md — Create ADMOB-SETUP.md guide + docs/privacy-policy.html + version bump + adService.ts privacyPolicyUrl (RELEASE-01, RELEASE-02, RELEASE-04)
+- [ ] 10-02-PLAN.md — Human checkpoint: fill real AdMob IDs + publish GitHub Pages + build signed release AAB (RELEASE-02, RELEASE-04)
+- [ ] 10-03-PLAN.md — Human checkpoint: upload AAB to internal testing track + enable Contains ads + update Data Safety (RELEASE-03, RELEASE-05)
 
 ## Progress
 
@@ -115,4 +118,4 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 | 7. GDPR Consent | v1.1 | 2/2 | Complete | 2026-04-13 |
 | 8. Banner Ad | v1.1 | 2/2 | Complete | 2026-04-13 |
 | 9. Interstitial Ad | v1.1 | 3/3 | Complete | 2026-04-13 |
-| 10. Production & Play Store | v1.1 | 0/TBD | Not started | - |
+| 10. Production & Play Store | v1.1 | 0/3 | Not started | - |
