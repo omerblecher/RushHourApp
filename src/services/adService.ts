@@ -1,4 +1,4 @@
-import { AdMob, AdmobConsentDebugGeography, AdmobConsentStatus } from '@capacitor-community/admob';
+import { AdMob, AdmobConsentDebugGeography, AdmobConsentStatus, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
 import type { AdmobConsentRequestOptions } from '@capacitor-community/admob';
 
 // Safe default: resolved promise so waitForConsent() never throws if called before initAdService()
@@ -35,4 +35,19 @@ export function showConsentForm(): Promise<unknown> {
   // Used by ProfileScreen "Privacy Settings" button (Plan 02) — revisit entry point.
   // NOTE: This calls showPrivacyOptionsForm (NOT showConsentForm) per RESEARCH.md Pitfall 2.
   return AdMob.showPrivacyOptionsForm();
+}
+
+export async function showBanner(): Promise<void> {
+  await waitForConsent();
+  await AdMob.showBanner({
+    adId: import.meta.env.VITE_ADMOB_BANNER_ID,
+    adSize: BannerAdSize.ADAPTIVE_BANNER,
+    position: BannerAdPosition.BOTTOM_CENTER,
+    margin: 0,
+    isTesting: import.meta.env.DEV,
+  });
+}
+
+export async function removeBanner(): Promise<void> {
+  await AdMob.removeBanner();
 }

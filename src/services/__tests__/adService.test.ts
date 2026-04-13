@@ -6,6 +6,9 @@ vi.mock('@capacitor-community/admob', () => ({
     showConsentForm: vi.fn(),
     showPrivacyOptionsForm: vi.fn(),
     initialize: vi.fn(),
+    showBanner: vi.fn(),
+    removeBanner: vi.fn(),
+    addListener: vi.fn(),
   },
   AdmobConsentDebugGeography: {
     DISABLED: 0,
@@ -17,6 +20,13 @@ vi.mock('@capacitor-community/admob', () => ({
     NOT_REQUIRED: 1,
     REQUIRED: 2,
     OBTAINED: 3,
+  },
+  BannerAdSize: { ADAPTIVE_BANNER: 'ADAPTIVE_BANNER' },
+  BannerAdPosition: { BOTTOM_CENTER: 'BOTTOM_CENTER' },
+  BannerAdPluginEvents: {
+    SizeChanged: 'bannerAdSizeChanged',
+    Loaded: 'bannerAdLoaded',
+    FailedToLoad: 'bannerAdFailedToLoad',
   },
 }));
 
@@ -160,5 +170,107 @@ describe('adService', () => {
     await waitForConsent();
 
     expect(AdMob.initialize).not.toHaveBeenCalled();
+  });
+
+  it('Test 9 (BANNER-01): showBanner() calls AdMob.showBanner exactly once after consent resolves', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1, // NOT_REQUIRED
+      canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    vi.mocked(AdMob.showBanner).mockResolvedValue(undefined);
+
+    const { initAdService, showBanner } = await import('../adService');
+    initAdService();
+    await showBanner();
+
+    expect(AdMob.showBanner).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test 10 (BANNER-01 / GDPR-04): showBanner() waits for consent — AdMob.showBanner not called until consent resolves', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    let resolveConsent!: (v: any) => void;
+    vi.mocked(AdMob.requestConsentInfo).mockReturnValue(
+      new Promise((r) => { resolveConsent = r; })
+    );
+    vi.mocked(AdMob.showBanner).mockResolvedValue(undefined);
+
+    const { initAdService, showBanner } = await import('../adService');
+    initAdService();
+    const bannerPromise = showBanner();
+    expect(AdMob.showBanner).not.toHaveBeenCalled();
+    resolveConsent({ status: 1, canRequestAds: true, privacyOptionsRequirementStatus: 'NOT_REQUIRED', isConsentFormAvailable: false });
+    await bannerPromise;
+    expect(AdMob.showBanner).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test 11 (BANNER-02): showBanner() passes ADAPTIVE_BANNER and BOTTOM_CENTER to AdMob.showBanner', async () => {
+    const { AdMob, BannerAdSize, BannerAdPosition } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1,
+      canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    vi.mocked(AdMob.showBanner).mockResolvedValue(undefined);
+
+    const { initAdService, showBanner } = await import('../adService');
+    initAdService();
+    await showBanner();
+
+    expect(AdMob.showBanner).toHaveBeenCalledWith(
+      expect.objectContaining({
+        adSize: BannerAdSize.ADAPTIVE_BANNER,
+        position: BannerAdPosition.BOTTOM_CENTER,
+      })
+    );
+  });
+
+  it('Test 12 (BANNER-02): showBanner() passes isTesting: true when import.meta.env.DEV is truthy', async () => {
+    vi.stubEnv('DEV', 'true');
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1,
+      canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    vi.mocked(AdMob.showBanner).mockResolvedValue(undefined);
+
+    const { initAdService, showBanner } = await import('../adService');
+    initAdService();
+    await showBanner();
+
+    expect(AdMob.showBanner).toHaveBeenCalledWith(
+      expect.objectContaining({ isTesting: true })
+    );
+  });
+
+  it('Test 13 (removeBanner contract): removeBanner() calls AdMob.removeBanner exactly once and resolves', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.removeBanner).mockResolvedValue(undefined);
+
+    const { removeBanner } = await import('../adService');
+    await removeBanner();
+
+    expect(AdMob.removeBanner).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test 14 (BANNER-05 unit aspect): When AdMob.showBanner rejects, showBanner() propagates the rejection', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1,
+      canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    vi.mocked(AdMob.showBanner).mockRejectedValue(new Error('Ad failed to load'));
+
+    const { initAdService, showBanner } = await import('../adService');
+    initAdService();
+
+    await expect(showBanner()).rejects.toThrow();
   });
 });
