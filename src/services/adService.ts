@@ -1,9 +1,14 @@
-import { AdMob, AdmobConsentDebugGeography, AdmobConsentStatus, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
+import { AdMob, AdmobConsentDebugGeography, AdmobConsentStatus, BannerAdSize, BannerAdPosition, InterstitialAdPluginEvents } from '@capacitor-community/admob';
 import type { AdmobConsentRequestOptions } from '@capacitor-community/admob';
 
 // Safe default: resolved promise so waitForConsent() never throws if called before initAdService()
 // (Per RESEARCH.md Pitfall 3 — protects against tree-shake/import-order bugs)
 let _consentReady: Promise<void> = Promise.resolve();
+
+// Phase 9 — interstitial frequency-cap counter. Module-level = session-only (resets on app restart).
+// Satisfies INTER-05 with zero persistence code.
+const AD_TIMEOUT_MS = 5000;
+let _winCount = 0;
 
 async function runConsentFlow(): Promise<void> {
   const options: AdmobConsentRequestOptions = {};
@@ -50,4 +55,27 @@ export async function showBanner(): Promise<void> {
 
 export async function removeBanner(): Promise<void> {
   await AdMob.removeBanner();
+}
+
+export async function prepareInterstitial(): Promise<void> {
+  await waitForConsent();
+  await AdMob.prepareInterstitial({
+    adId: import.meta.env.VITE_ADMOB_INTERSTITIAL_ID,
+    isTesting: import.meta.env.DEV,
+  });
+}
+
+export async function showInterstitialIfDue(): Promise<void> {
+  _winCount++;
+  if (_winCount % 3 !== 0) return;
+  await waitForConsent();
+  const showAndWait = new Promise<void>((resolve) => {
+    void AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+      void prepareInterstitial(); // reload for next trigger
+      resolve();
+    });
+    void AdMob.showInterstitial();
+  });
+  const timeout = new Promise<void>((res) => setTimeout(res, AD_TIMEOUT_MS));
+  await Promise.race([showAndWait, timeout]);
 }
