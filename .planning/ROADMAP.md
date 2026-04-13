@@ -85,7 +85,10 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   3. After the interstitial is dismissed, it automatically reloads so it is ready for the next trigger
   4. If the interstitial fails to show or load, the WinModal appears within 5–8 seconds regardless — no permanent block
   5. The win counter is session-only and resets to zero on app restart
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 09-01-PLAN.md — Extend adService.ts with prepareInterstitial + showInterstitialIfDue (counter, timeout, reload) + unit tests (INTER-01/03/04/05)
+- [ ] 09-02-PLAN.md — Refactor WinModal to callback-driven nav + GameScreen preload useEffect + handleWinNavigate wrapper (INTER-01/02)
+- [ ] 09-03-PLAN.md — Build, install, human device verification of INTER-02/03/04/05 on Android
 
 ### Phase 10: Production & Play Store
 **Goal**: The app is released with real ad IDs, an updated privacy policy, compliant Play Store metadata, and a passing internal track test
@@ -111,5 +114,5 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 | 6. Android Native Setup | v1.1 | 0/2 | Not started | - |
 | 7. GDPR Consent | v1.1 | 0/2 | Planned | - |
 | 8. Banner Ad | v1.1 | 0/2 | Planned | - |
-| 9. Interstitial Ad | v1.1 | 0/TBD | Not started | - |
+| 9. Interstitial Ad | v1.1 | 0/3 | Planned | - |
 | 10. Production & Play Store | v1.1 | 0/TBD | Not started | - |
