@@ -11,7 +11,12 @@ const AD_TIMEOUT_MS = 5000;
 let _winCount = 0;
 
 async function runConsentFlow(): Promise<void> {
-  const options: AdmobConsentRequestOptions = {};
+  // TODO Phase 10: Replace with real GitHub Pages URL after publishing docs/privacy-policy.html
+  // e.g. https://YOUR_GITHUB_USERNAME.github.io/rush-hour-puzzle/privacy-policy.html
+  // privacyPolicyUrl is not typed in plugin v8 AdmobConsentRequestOptions — cast required.
+  const options = {
+    privacyPolicyUrl: 'https://example.com/privacy-policy',
+  } as AdmobConsentRequestOptions;
   if (import.meta.env.VITE_ADMOB_DEBUG_EEA === 'true') {
     options.debugGeography = AdmobConsentDebugGeography.EEA;
     const deviceId = import.meta.env.VITE_ADMOB_DEBUG_DEVICE_ID;
