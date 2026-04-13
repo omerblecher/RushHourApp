@@ -70,7 +70,9 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   3. The GameScreen content is not obscured by the banner — bottom padding is added equal to banner height when running on native
   4. Navigating away from the GameScreen removes the banner (no banner persists on other screens)
   5. A banner load failure produces no visible error to the user and does not affect puzzle gameplay
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 08-01-PLAN.md — Extend adService with showBanner/removeBanner + tests; wire GameScreen banner lifecycle with dynamic padding (BANNER-01, 02, 03, 04, 05 code complete; unit-verifies 01/02/05)
+- [ ] 08-02-PLAN.md — Build APK, install on device, human verification of all 5 BANNER behaviors (visual: 01/03/04, airplane-mode failure: 05, logcat/visual: 02)
 **UI hint**: yes
 
 ### Phase 9: Interstitial Ad
@@ -108,6 +110,6 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 | 5. Sound and Polish | v1.0 | 4/4 | Complete | 2026-02-22 |
 | 6. Android Native Setup | v1.1 | 0/2 | Not started | - |
 | 7. GDPR Consent | v1.1 | 0/2 | Planned | - |
-| 8. Banner Ad | v1.1 | 0/TBD | Not started | - |
+| 8. Banner Ad | v1.1 | 0/2 | Planned | - |
 | 9. Interstitial Ad | v1.1 | 0/TBD | Not started | - |
 | 10. Production & Play Store | v1.1 | 0/TBD | Not started | - |
