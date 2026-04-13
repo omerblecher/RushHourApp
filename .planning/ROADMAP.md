@@ -71,8 +71,8 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   4. Navigating away from the GameScreen removes the banner (no banner persists on other screens)
   5. A banner load failure produces no visible error to the user and does not affect puzzle gameplay
 **Plans**: 2 plans
-- [ ] 08-01-PLAN.md — Extend adService with showBanner/removeBanner + tests; wire GameScreen banner lifecycle with dynamic padding (BANNER-01, 02, 03, 04, 05 code complete; unit-verifies 01/02/05)
-- [ ] 08-02-PLAN.md — Build APK, install on device, human verification of all 5 BANNER behaviors (visual: 01/03/04, airplane-mode failure: 05, logcat/visual: 02)
+- [x] 08-01-PLAN.md — Extend adService with showBanner/removeBanner + tests; wire GameScreen banner lifecycle with dynamic padding (BANNER-01, 02, 03, 04, 05 code complete; unit-verifies 01/02/05)
+- [x] 08-02-PLAN.md — Build APK, install on device, human verification of all 5 BANNER behaviors (visual: 01/03/04, airplane-mode failure: 05, logcat/visual: 02)
 **UI hint**: yes
 
 ### Phase 9: Interstitial Ad
