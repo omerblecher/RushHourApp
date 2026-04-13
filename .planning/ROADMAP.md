@@ -57,8 +57,8 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   4. Changing network conditions or restarting the app never causes an ad to load before the consent flow completes
   5. A privacy/consent settings entry point is accessible from within the app UI so users can revisit their consent choice
 **Plans**: 2 plans
-- [ ] 07-01-PLAN.md — Create adService.ts singleton + unit tests + main.tsx wiring + .env.development debug vars (GDPR-01, GDPR-03, GDPR-04 automated)
-- [ ] 07-02-PLAN.md — Add Privacy Settings button to ProfileScreen + device checkpoint for EEA/non-EEA/revisit flow (GDPR-02, GDPR-05)
+- [x] 07-01-PLAN.md — Create adService.ts singleton + unit tests + main.tsx wiring + .env.development debug vars (GDPR-01, GDPR-03, GDPR-04 automated)
+- [x] 07-02-PLAN.md — Add Privacy Settings button to ProfileScreen + device checkpoint for EEA/non-EEA/revisit flow (GDPR-02, GDPR-05)
 
 ### Phase 8: Banner Ad
 **Goal**: A banner ad is visible at the bottom of the GameScreen and is correctly removed when the user navigates away
