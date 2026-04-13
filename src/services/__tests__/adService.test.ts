@@ -389,7 +389,7 @@ describe('adService', () => {
     expect(AdMob.showInterstitial).toHaveBeenCalledTimes(2);
   });
 
-  it('Test 20 (INTER-03 reload): When Dismissed fires, prepareInterstitial is called again to reload', async () => {
+  it('Test 20 (INTER-03 reload): adService does NOT call prepareInterstitial on Dismissed — reload is caller responsibility', async () => {
     const { AdMob } = await import('@capacitor-community/admob');
     vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
       status: 1, canRequestAds: true,
@@ -408,12 +408,11 @@ describe('adService', () => {
     await prepareInterstitial(); // initial preload (call 1)
     await showInterstitialIfDue();
     await showInterstitialIfDue();
-    await showInterstitialIfDue(); // 3rd → triggers show + Dismissed → reload (call 2)
+    await showInterstitialIfDue(); // 3rd → triggers show + Dismissed → resolveShow only, no reload
 
-    // Allow the microtask queue to flush so the void prepareInterstitial() in the listener runs
-    await new Promise((r) => setTimeout(r, 10));
-
-    expect(AdMob.prepareInterstitial).toHaveBeenCalledTimes(2);
+    // Reload is now GameScreen's responsibility (triggered when WinModal opens).
+    // adService must NOT call prepareInterstitial a second time.
+    expect(AdMob.prepareInterstitial).toHaveBeenCalledTimes(1);
   });
 
   it('Test 21 (INTER-04 timeout): showInterstitialIfDue() resolves within timeout when Dismissed never fires', async () => {

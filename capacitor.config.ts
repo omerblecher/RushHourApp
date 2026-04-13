@@ -4,6 +4,9 @@ const config: CapacitorConfig = {
   appId: 'com.otis.brooke.rushhour.puzzle',
   appName: 'Rush Hour',
   webDir: 'dist',
+  android: {
+    backgroundColor: '#1a0f00',
+  },
   plugins: {
     FirebaseAuthentication: {
       skipNativeAuth: false,

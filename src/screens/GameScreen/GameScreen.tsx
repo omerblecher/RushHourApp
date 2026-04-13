@@ -30,7 +30,10 @@ export function GameScreen() {
   const [showWinModal, setShowWinModal] = useState(false);
   const [isNewPersonalBest, setIsNewPersonalBest] = useState(false);
   const [isWinAnimating, setIsWinAnimating] = useState(false);
-  const [bannerHeight, setBannerHeight] = useState(0);
+  // Pre-reserve ADAPTIVE_BANNER height (64dp) on native so the container
+  // layout doesn't shift when SizeChanged fires — that shift was causing the
+  // white-screen flash that covered win celebrations and puzzle transitions.
+  const [bannerHeight, setBannerHeight] = useState(Capacitor.isNativePlatform() ? 64 : 0);
 
   // Load puzzle when puzzleId changes
   useEffect(() => {
@@ -123,18 +126,23 @@ export function GameScreen() {
     };
   }, []);
 
-  // Interstitial preload (Phase 9 — INTER-01)
-  // Deferred 3 s so the native AdMob download completes while the user is
-  // mid-puzzle rather than mid-navigation, avoiding a white-screen overlay
-  // that the AdMob SDK briefly shows when the first ad finishes loading.
+  // Interstitial preload (Phase 9 — INTER-01).
+  // Fires 5 s after each puzzle loads so the download completes during active
+  // gameplay — never during win animations, WinModal viewing, or navigation.
+  // Keyed on puzzleId so it re-arms after every puzzle-to-puzzle transition,
+  // keeping the ad slot warm for the next multiple-of-3 win.
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
-    const timer = setTimeout(() => void prepareInterstitial(), 3000);
+    const timer = setTimeout(() => void prepareInterstitial(), 5000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [puzzleId]);
 
-  // Win-flow navigation wrapper — awaits interstitial on native (Phase 9 — INTER-02)
+  // Win-flow navigation wrapper — awaits interstitial on native (Phase 9 — INTER-02).
+  // setShowWinModal(false) fires FIRST so the modal closes immediately on tap,
+  // before the interstitial await. This prevents a flash of the previous puzzle's
+  // solved board state after the ad dismisses and the new puzzle loads.
   const handleWinNavigate = async (action: () => void) => {
+    setShowWinModal(false);
     if (Capacitor.isNativePlatform()) {
       await showInterstitialIfDue(); // always resolves within 5s (timeout guard)
     }
@@ -170,13 +178,11 @@ export function GameScreen() {
               } else {
                 navigate(`/puzzles?difficulty=${difficulty ?? 'beginner'}`);
               }
-              setShowWinModal(false);
             });
           }}
           onBackToSelection={() => {
             void handleWinNavigate(() => {
               navigate(`/puzzles?difficulty=${difficulty ?? 'beginner'}`);
-              setShowWinModal(false);
             });
           }}
         />

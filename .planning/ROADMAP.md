@@ -25,9 +25,9 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 **Milestone Goal:** Add Google AdMob banner and interstitial ads to the Android app using the Capacitor AdMob plugin, with full GDPR consent compliance and a Play Store update declaring ads.
 
 - [x] **Phase 6: Android Native Setup** — Install plugin, configure Gradle, add AdMob manifest entries so the app builds and launches without crash (completed 2026-04-13)
-- [ ] **Phase 7: GDPR Consent** — Implement adService singleton and UMP consent flow; no ad may load before consent resolves
-- [ ] **Phase 8: Banner Ad** — Display adaptive banner at bottom of GameScreen with lifecycle management and layout padding
-- [ ] **Phase 9: Interstitial Ad** — Preload and show interstitial every 3rd win with timeout guard and auto-reload
+- [x] **Phase 7: GDPR Consent** — Implement adService singleton and UMP consent flow; no ad may load before consent resolves (completed 2026-04-13)
+- [x] **Phase 8: Banner Ad** — Display adaptive banner at bottom of GameScreen with lifecycle management and layout padding (completed 2026-04-13)
+- [x] **Phase 9: Interstitial Ad** — Preload and show interstitial every 3rd win with timeout guard and auto-reload (completed 2026-04-13)
 - [ ] **Phase 10: Production & Play Store** — Swap in real ad IDs, update privacy policy and Play Store metadata, bump version, test release AAB
 
 ## Phase Details
@@ -86,9 +86,9 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   4. If the interstitial fails to show or load, the WinModal appears within 5–8 seconds regardless — no permanent block
   5. The win counter is session-only and resets to zero on app restart
 **Plans**: 3 plans
-- [ ] 09-01-PLAN.md — Extend adService.ts with prepareInterstitial + showInterstitialIfDue (counter, timeout, reload) + unit tests (INTER-01/03/04/05)
-- [ ] 09-02-PLAN.md — Refactor WinModal to callback-driven nav + GameScreen preload useEffect + handleWinNavigate wrapper (INTER-01/02)
-- [ ] 09-03-PLAN.md — Build, install, human device verification of INTER-02/03/04/05 on Android
+- [x] 09-01-PLAN.md — Extend adService.ts with prepareInterstitial + showInterstitialIfDue (counter, timeout, reload) + unit tests (INTER-01/03/04/05)
+- [x] 09-02-PLAN.md — Refactor WinModal to callback-driven nav + GameScreen preload useEffect + handleWinNavigate wrapper (INTER-01/02)
+- [x] 09-03-PLAN.md — Build, install, human device verification of INTER-02/03/04/05 on Android (all 5 checks passed)
 
 ### Phase 10: Production & Play Store
 **Goal**: The app is released with real ad IDs, an updated privacy policy, compliant Play Store metadata, and a passing internal track test
@@ -111,8 +111,8 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 | 3. Puzzle Data & Nav | v1.0 | 4/4 | Complete | 2026-02-20 |
 | 4. Firebase Integration | v1.0 | 6/6 | Complete | 2026-02-22 |
 | 5. Sound and Polish | v1.0 | 4/4 | Complete | 2026-02-22 |
-| 6. Android Native Setup | v1.1 | 0/2 | Not started | - |
-| 7. GDPR Consent | v1.1 | 0/2 | Planned | - |
-| 8. Banner Ad | v1.1 | 0/2 | Planned | - |
-| 9. Interstitial Ad | v1.1 | 0/3 | Planned | - |
+| 6. Android Native Setup | v1.1 | 2/2 | Complete | 2026-04-13 |
+| 7. GDPR Consent | v1.1 | 2/2 | Complete | 2026-04-13 |
+| 8. Banner Ad | v1.1 | 2/2 | Complete | 2026-04-13 |
+| 9. Interstitial Ad | v1.1 | 3/3 | Complete | 2026-04-13 |
 | 10. Production & Play Store | v1.1 | 0/TBD | Not started | - |
