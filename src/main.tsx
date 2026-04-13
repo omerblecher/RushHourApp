@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { HashRouter } from 'react-router';
 import App from './App';
 import { useAuthStore } from './store/authStore';
+import { initAdService } from './services/adService';
 import './index.css';
 
 // Native platform setup (no-op in browser)
@@ -23,6 +24,7 @@ async function initNative() {
 
 void initNative();
 useAuthStore.getState().initAuth();
+initAdService();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element not found');
