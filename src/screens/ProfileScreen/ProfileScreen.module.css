@@ -267,6 +267,28 @@
 }
 
 /* ============================================================
+   Privacy settings button (subtle neutral — distinct from sign-out red)
+   ============================================================ */
+
+.privacyButton {
+  width: 100%;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.privacyButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ============================================================
    Responsive
    ============================================================ */
 

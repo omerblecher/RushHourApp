@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useProgressStore } from '../../store/progressStore';
 import { getUserDisplayName, setDisplayName } from '../../services/scoreService';
 import { formatTime } from '../../utils/formatTime';
+import { showConsentForm } from '../../services/adService';
 import styles from './ProfileScreen.module.css';
 
 export function ProfileScreen() {
@@ -63,6 +64,17 @@ export function ProfileScreen() {
   const handleSignOut = async () => {
     await signOut();
     // onAuthStateChanged fires with null -> App.tsx shows AuthPromptScreen
+  };
+
+  const handlePrivacySettings = async () => {
+    try {
+      await showConsentForm();
+    } catch (err) {
+      // Per RESEARCH.md Pitfall 5: showPrivacyOptionsForm may reject when
+      // privacyOptionsRequirementStatus is NOT_REQUIRED (non-EEA users).
+      // Swallow gracefully — do not surface to user, log only in dev.
+      if (import.meta.env.DEV) console.warn('Privacy settings form unavailable:', err);
+    }
   };
 
   const handleUpgrade = async () => {
@@ -178,6 +190,17 @@ export function ProfileScreen() {
         <section className={styles.section}>
           <button className={styles.signOutButton} onClick={handleSignOut}>
             Sign Out
+          </button>
+        </section>
+
+        {/* Privacy / consent settings — GDPR-05 entry point */}
+        <section className={styles.section}>
+          <button
+            className={styles.privacyButton}
+            onClick={handlePrivacySettings}
+            aria-label="Open privacy settings"
+          >
+            Privacy Settings
           </button>
         </section>
       </div>
