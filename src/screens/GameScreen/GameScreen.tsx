@@ -45,6 +45,11 @@ export function GameScreen() {
       return;
     }
 
+    // Clear any lingering confetti canvas from the previous win before loading
+    // the new puzzle. canvas-confetti renders on a global canvas outside React's
+    // lifecycle, so it survives navigation and must be explicitly stopped.
+    void import('canvas-confetti').then(({ default: confetti }) => confetti.reset());
+
     loadPuzzle(puzzle.gridString, puzzle.minMoves);
     soundService.playStart();
     setShowWinModal(false);

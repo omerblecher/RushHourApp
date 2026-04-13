@@ -69,13 +69,24 @@ export async function showInterstitialIfDue(): Promise<void> {
   _winCount++;
   if (_winCount % 3 !== 0) return;
   await waitForConsent();
-  const showAndWait = new Promise<void>((resolve) => {
-    void AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
-      void prepareInterstitial(); // reload for next trigger
-      resolve();
-    });
-    void AdMob.showInterstitial();
+
+  // Hoist resolve so the listener callback can reach it.
+  let resolveShow!: () => void;
+  const showAndWait = new Promise<void>((resolve) => { resolveShow = resolve; });
+
+  // Await listener registration BEFORE showing the ad to eliminate the race
+  // condition where Dismissed fires before the handler is attached.
+  const handle = await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+    void handle.remove(); // one-shot: prevent listener accumulation across wins
+    void prepareInterstitial();
+    resolveShow();
   });
+
+  void AdMob.showInterstitial();
+
   const timeout = new Promise<void>((res) => setTimeout(res, AD_TIMEOUT_MS));
   await Promise.race([showAndWait, timeout]);
+
+  // Timeout path: remove the listener so it doesn't fire stale on future ads.
+  void handle.remove();
 }
