@@ -9,6 +9,9 @@ vi.mock('@capacitor-community/admob', () => ({
     showBanner: vi.fn(),
     removeBanner: vi.fn(),
     addListener: vi.fn(),
+    prepareInterstitial: vi.fn(),
+    showInterstitial: vi.fn(),
+    removeAllListeners: vi.fn(),
   },
   AdmobConsentDebugGeography: {
     DISABLED: 0,
@@ -27,6 +30,13 @@ vi.mock('@capacitor-community/admob', () => ({
     SizeChanged: 'bannerAdSizeChanged',
     Loaded: 'bannerAdLoaded',
     FailedToLoad: 'bannerAdFailedToLoad',
+  },
+  InterstitialAdPluginEvents: {
+    Dismissed: 'interstitialAdDismissed',
+    FailedToLoad: 'interstitialAdFailedToLoad',
+    FailedToShow: 'interstitialAdFailedToShow',
+    Loaded: 'interstitialAdLoaded',
+    Showed: 'interstitialAdShowed',
   },
 }));
 
@@ -272,5 +282,198 @@ describe('adService', () => {
     initAdService();
 
     await expect(showBanner()).rejects.toThrow();
+  });
+
+  // ========== Phase 9 — Interstitial ==========
+
+  it('Test 15 (INTER-01): prepareInterstitial() awaits consent and calls AdMob.prepareInterstitial exactly once', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1,
+      canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined as any);
+
+    const { initAdService, prepareInterstitial } = await import('../adService');
+    initAdService();
+    await prepareInterstitial();
+
+    expect(AdMob.prepareInterstitial).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test 16 (INTER-01): prepareInterstitial() passes adId from env and isTesting=true in DEV', async () => {
+    vi.stubEnv('DEV', 'true');
+    vi.stubEnv('VITE_ADMOB_INTERSTITIAL_ID', 'ca-app-pub-test/interstitial');
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1, canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined as any);
+
+    const { initAdService, prepareInterstitial } = await import('../adService');
+    initAdService();
+    await prepareInterstitial();
+
+    expect(AdMob.prepareInterstitial).toHaveBeenCalledWith(
+      expect.objectContaining({
+        adId: 'ca-app-pub-test/interstitial',
+        isTesting: true,
+      })
+    );
+  });
+
+  it('Test 17 (INTER-02 counter): showInterstitialIfDue() does NOT call showInterstitial on win 1 or win 2', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1, canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+
+    const { initAdService, showInterstitialIfDue } = await import('../adService');
+    initAdService();
+    await showInterstitialIfDue();
+    await showInterstitialIfDue();
+
+    expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+  });
+
+  it('Test 18 (INTER-02 counter): showInterstitialIfDue() calls showInterstitial exactly once on win 3', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1, canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    vi.mocked(AdMob.addListener).mockImplementation(((_event: any, cb: any) => {
+      // Fire Dismissed synchronously so the promise resolves
+      setTimeout(() => cb(), 0);
+      return Promise.resolve({ remove: vi.fn() });
+    }) as any);
+    vi.mocked(AdMob.showInterstitial).mockResolvedValue(undefined as any);
+    vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined as any);
+
+    const { initAdService, showInterstitialIfDue } = await import('../adService');
+    initAdService();
+    await showInterstitialIfDue();
+    await showInterstitialIfDue();
+    await showInterstitialIfDue();
+
+    expect(AdMob.showInterstitial).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test 19 (INTER-02 counter): showInterstitialIfDue() shows on win 3 AND win 6 (every 3rd)', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1, canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    vi.mocked(AdMob.addListener).mockImplementation(((_event: any, cb: any) => {
+      setTimeout(() => cb(), 0);
+      return Promise.resolve({ remove: vi.fn() });
+    }) as any);
+    vi.mocked(AdMob.showInterstitial).mockResolvedValue(undefined as any);
+    vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined as any);
+
+    const { initAdService, showInterstitialIfDue } = await import('../adService');
+    initAdService();
+    for (let i = 0; i < 6; i++) {
+      await showInterstitialIfDue();
+    }
+
+    expect(AdMob.showInterstitial).toHaveBeenCalledTimes(2);
+  });
+
+  it('Test 20 (INTER-03 reload): When Dismissed fires, prepareInterstitial is called again to reload', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1, canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    vi.mocked(AdMob.addListener).mockImplementation(((_event: any, cb: any) => {
+      setTimeout(() => cb(), 0);
+      return Promise.resolve({ remove: vi.fn() });
+    }) as any);
+    vi.mocked(AdMob.showInterstitial).mockResolvedValue(undefined as any);
+    vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined as any);
+
+    const { initAdService, prepareInterstitial, showInterstitialIfDue } = await import('../adService');
+    initAdService();
+    await prepareInterstitial(); // initial preload (call 1)
+    await showInterstitialIfDue();
+    await showInterstitialIfDue();
+    await showInterstitialIfDue(); // 3rd → triggers show + Dismissed → reload (call 2)
+
+    // Allow the microtask queue to flush so the void prepareInterstitial() in the listener runs
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(AdMob.prepareInterstitial).toHaveBeenCalledTimes(2);
+  });
+
+  it('Test 21 (INTER-04 timeout): showInterstitialIfDue() resolves within timeout when Dismissed never fires', async () => {
+    vi.useFakeTimers();
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1, canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+    // addListener never fires its callback — simulates ad hang
+    vi.mocked(AdMob.addListener).mockResolvedValue({ remove: vi.fn() } as any);
+    vi.mocked(AdMob.showInterstitial).mockResolvedValue(undefined as any);
+
+    const { initAdService, showInterstitialIfDue } = await import('../adService');
+    initAdService();
+    await vi.runAllTimersAsync(); // flush consent
+    // Need to advance non-fake-timer awaits manually — use real timers for the gating awaits
+    vi.useRealTimers();
+    await showInterstitialIfDue(); // win 1 (no-op)
+    await showInterstitialIfDue(); // win 2 (no-op)
+    vi.useFakeTimers();
+    const promise = showInterstitialIfDue(); // win 3 → enters race
+    await vi.advanceTimersByTimeAsync(5000);
+    await expect(promise).resolves.toBeUndefined();
+    vi.useRealTimers();
+  });
+
+  it('Test 22 (INTER-05 session reset): Re-importing the module resets _winCount to 0', async () => {
+    const { AdMob } = await import('@capacitor-community/admob');
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1, canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+
+    // Round 1: tick the counter twice
+    {
+      const { initAdService, showInterstitialIfDue } = await import('../adService');
+      initAdService();
+      await showInterstitialIfDue();
+      await showInterstitialIfDue();
+      expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+    }
+
+    // Simulate app restart
+    vi.resetModules();
+    vi.clearAllMocks();
+    vi.mocked(AdMob.requestConsentInfo).mockResolvedValue({
+      status: 1, canRequestAds: true,
+      privacyOptionsRequirementStatus: 'NOT_REQUIRED' as any,
+      isConsentFormAvailable: false,
+    });
+
+    // Round 2: only one win — should NOT show (counter was reset to 0, then incremented to 1)
+    {
+      const { initAdService, showInterstitialIfDue } = await import('../adService');
+      initAdService();
+      await showInterstitialIfDue();
+      expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+    }
   });
 });
