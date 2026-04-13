@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
 import { getNextPuzzle } from '../../data/puzzleIndex';
 import { useAuthStore } from '../../store/authStore';
 import { useLeaderboard } from '../../hooks/useLeaderboard';
@@ -9,24 +8,23 @@ import styles from './WinModal.module.css';
 
 interface WinModalProps {
   puzzleId: string;
-  difficulty: string;
   moveCount: number;
   minMoves: number;
   timeMs: number;
   isNewPersonalBest: boolean;
-  onClose: () => void;
+  onNextPuzzle: () => void;
+  onBackToSelection: () => void;
 }
 
 export function WinModal({
   puzzleId,
-  difficulty,
   moveCount,
   minMoves,
   timeMs,
   isNewPersonalBest,
-  onClose,
+  onNextPuzzle,
+  onBackToSelection,
 }: WinModalProps) {
-  const navigate = useNavigate();
   const nextPuzzle = getNextPuzzle(puzzleId);
   const isOptimal = moveCount === minMoves;
 
@@ -45,20 +43,6 @@ export function WinModal({
           return idx >= 0 ? idx + 1 : 0;
         })()
       : 0;
-
-  const handleNextPuzzle = () => {
-    if (nextPuzzle) {
-      navigate(`/play/${nextPuzzle.difficulty}/${nextPuzzle.id}`);
-    } else {
-      navigate(`/puzzles?difficulty=${difficulty}`);
-    }
-    onClose();
-  };
-
-  const handleBackToSelection = () => {
-    navigate(`/puzzles?difficulty=${difficulty}`);
-    onClose();
-  };
 
   return (
     <div className={styles.backdrop} role="dialog" aria-modal="true" aria-label="Puzzle complete">
@@ -109,10 +93,10 @@ export function WinModal({
         </button>
 
         <div className={styles.actions}>
-          <button className={styles.primaryButton} onClick={handleNextPuzzle}>
+          <button className={styles.primaryButton} onClick={onNextPuzzle}>
             {nextPuzzle ? 'Next Puzzle' : 'More Puzzles'}
           </button>
-          <button className={styles.secondaryButton} onClick={handleBackToSelection}>
+          <button className={styles.secondaryButton} onClick={onBackToSelection}>
             Back to Selection
           </button>
         </div>
