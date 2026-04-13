@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
+import { Capacitor } from '@capacitor/core';
+import type { PluginListenerHandle } from '@capacitor/core';
+import { AdMob, BannerAdPluginEvents } from '@capacitor-community/admob';
+import type { AdMobBannerSize } from '@capacitor-community/admob';
+import { showBanner, removeBanner } from '../../services/adService';
 import { useGameStore } from '../../store/gameStore';
 import { useProgressStore } from '../../store/progressStore';
 import { getPuzzleById } from '../../data/puzzleIndex';
@@ -25,6 +30,7 @@ export function GameScreen() {
   const [showWinModal, setShowWinModal] = useState(false);
   const [isNewPersonalBest, setIsNewPersonalBest] = useState(false);
   const [isWinAnimating, setIsWinAnimating] = useState(false);
+  const [bannerHeight, setBannerHeight] = useState(0);
 
   // Load puzzle when puzzleId changes
   useEffect(() => {
@@ -88,6 +94,30 @@ export function GameScreen() {
     }
   }, [state?.isWon]);
 
+  // Banner ad lifecycle (Phase 8 — BANNER-01..05)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    let listenerHandle: PluginListenerHandle | null = null;
+
+    AdMob.addListener(
+      BannerAdPluginEvents.SizeChanged,
+      (info: AdMobBannerSize) => {
+        setBannerHeight(info.height);
+      }
+    ).then((handle) => {
+      listenerHandle = handle;
+    });
+
+    void showBanner();
+
+    return () => {
+      listenerHandle?.remove();
+      void removeBanner();
+      setBannerHeight(0);
+    };
+  }, []);
+
   if (!state) {
     return (
       <div className={styles.loading}>
@@ -97,7 +127,7 @@ export function GameScreen() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={{ paddingBottom: bannerHeight }}>
       <GameHeader />
       <GameHUD />
       <Board isWinAnimating={isWinAnimating} />
