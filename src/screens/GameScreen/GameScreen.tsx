@@ -124,9 +124,13 @@ export function GameScreen() {
   }, []);
 
   // Interstitial preload (Phase 9 — INTER-01)
+  // Deferred 3 s so the native AdMob download completes while the user is
+  // mid-puzzle rather than mid-navigation, avoiding a white-screen overlay
+  // that the AdMob SDK briefly shows when the first ad finishes loading.
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
-    void prepareInterstitial();
+    const timer = setTimeout(() => void prepareInterstitial(), 3000);
+    return () => clearTimeout(timer);
   }, []);
 
   // Win-flow navigation wrapper — awaits interstitial on native (Phase 9 — INTER-02)

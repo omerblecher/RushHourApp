@@ -78,7 +78,11 @@ export async function showInterstitialIfDue(): Promise<void> {
   // condition where Dismissed fires before the handler is attached.
   const handle = await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
     void handle.remove(); // one-shot: prevent listener accumulation across wins
-    void prepareInterstitial();
+    // AdMob forbids calling loadAd() from inside onAdDismissedFullScreenContent —
+    // it creates a loading loop that causes silent failures and visual artifacts.
+    // queueMicrotask defers past the current callback frame without introducing a
+    // macrotask timeout, which would leak between Vitest tests.
+    queueMicrotask(() => void prepareInterstitial());
     resolveShow();
   });
 
