@@ -4,10 +4,10 @@ import { Capacitor } from '@capacitor/core';
 import type { PluginListenerHandle } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents } from '@capacitor-community/admob';
 import type { AdMobBannerSize } from '@capacitor-community/admob';
-import { showBanner, removeBanner } from '../../services/adService';
+import { showBanner, removeBanner, prepareInterstitial, showInterstitialIfDue } from '../../services/adService';
 import { useGameStore } from '../../store/gameStore';
 import { useProgressStore } from '../../store/progressStore';
-import { getPuzzleById } from '../../data/puzzleIndex';
+import { getPuzzleById, getNextPuzzle } from '../../data/puzzleIndex';
 import { submitScore } from '../../services/scoreService';
 import { soundService } from '../../services/soundService';
 import { Board } from '../../components/Board/Board';
@@ -118,6 +118,20 @@ export function GameScreen() {
     };
   }, []);
 
+  // Interstitial preload (Phase 9 — INTER-01)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    void prepareInterstitial();
+  }, []);
+
+  // Win-flow navigation wrapper — awaits interstitial on native (Phase 9 — INTER-02)
+  const handleWinNavigate = async (action: () => void) => {
+    if (Capacitor.isNativePlatform()) {
+      await showInterstitialIfDue(); // always resolves within 5s (timeout guard)
+    }
+    action();
+  };
+
   if (!state) {
     return (
       <div className={styles.loading}>
@@ -135,12 +149,27 @@ export function GameScreen() {
       {showWinModal && puzzleId && (
         <WinModal
           puzzleId={puzzleId}
-          difficulty={difficulty ?? 'beginner'}
           moveCount={state.moveCount}
           minMoves={minMoves}
           timeMs={(state.endTime ?? Date.now()) - (state.startTime ?? Date.now())}
           isNewPersonalBest={isNewPersonalBest}
-          onClose={() => setShowWinModal(false)}
+          onNextPuzzle={() => {
+            const nextPuzzle = getNextPuzzle(puzzleId);
+            void handleWinNavigate(() => {
+              if (nextPuzzle) {
+                navigate(`/play/${nextPuzzle.difficulty}/${nextPuzzle.id}`);
+              } else {
+                navigate(`/puzzles?difficulty=${difficulty ?? 'beginner'}`);
+              }
+              setShowWinModal(false);
+            });
+          }}
+          onBackToSelection={() => {
+            void handleWinNavigate(() => {
+              navigate(`/puzzles?difficulty=${difficulty ?? 'beginner'}`);
+              setShowWinModal(false);
+            });
+          }}
         />
       )}
     </div>
