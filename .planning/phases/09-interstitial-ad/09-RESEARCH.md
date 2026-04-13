@@ -349,22 +349,25 @@ No new security surface introduced. The GDPR consent gate (`waitForConsent()`) i
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`difficulty` prop in WinModal after refactor**
    - What we know: `difficulty` is currently only used inside `handleBackToSelection` to build the navigate URL.
    - What's unclear: After GameScreen owns navigation, `difficulty` may become unused in WinModal, causing a TypeScript lint warning.
    - Recommendation: Remove `difficulty` from WinModal props if it has no other use in WinModal (currently it does not — leaderboard uses `puzzleId` not `difficulty`). GameScreen already has `difficulty` from `useParams`.
+   - **RESOLVED:** Plan 02 Task 1 removes `difficulty` from `WinModalProps` per CONTEXT.md locked decision.
 
 2. **`onClose` prop after refactor**
    - What we know: `onClose` is currently called inside both navigation handlers AND passed from GameScreen as `() => setShowWinModal(false)`.
    - What's unclear: After the refactor, if WinModal drops internal navigation, does `onClose` still serve a purpose?
    - Recommendation: Remove `onClose` entirely from WinModal since the new `onNextPuzzle`/`onBackToSelection` callbacks include `setShowWinModal(false)`. Only needed if WinModal has a dedicated close/X button (it does not currently).
+   - **RESOLVED:** Plan 02 Task 1 removes `onClose` from `WinModalProps`; new `onNextPuzzle`/`onBackToSelection` callbacks already call `setShowWinModal(false)`.
 
 3. **`nextPuzzle` logic in WinModal vs GameScreen**
    - What we know: WinModal calls `getNextPuzzle(puzzleId)` to decide whether to show "Next Puzzle" or "More Puzzles" button label, and to compute the navigate target.
    - What's unclear: The CONTEXT.md locked design has GameScreen build the navigation logic. GameScreen's lambda for `onNextPuzzle` uses `nextPuzzle` — so GameScreen needs to also call `getNextPuzzle(puzzleId)`.
    - Recommendation: Keep `getNextPuzzle` in both GameScreen (for the callback logic) and WinModal (for the button label). Or pass `hasNextPuzzle: boolean` as a prop. Either is fine — the planner should pick one.
+   - **RESOLVED:** Plan 02 Task 2 keeps `getNextPuzzle` in both WinModal (button label) and adds it to GameScreen (callback navigation logic).
 
 ---
 
