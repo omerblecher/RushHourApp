@@ -43,7 +43,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   4. `AD_ID` permission appears in compiled APK manifest (verified via manifest dump or build output)
   5. Dev builds use Google test App ID and test ad unit IDs; environment variable gate is in place for production IDs
 **Plans**: 2 plans
-- [ ] 06-01-PLAN.md — Install AdMob plugin, pin gradle version, update manifest/strings, create env files
+- [x] 06-01-PLAN.md — Install AdMob plugin, pin gradle version, update manifest/strings, create env files
 - [ ] 06-02-PLAN.md — Manual Android Studio build + device launch + adb AD_ID verification (checkpoint)
 
 ### Phase 7: GDPR Consent
