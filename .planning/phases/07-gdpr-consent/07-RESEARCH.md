@@ -377,7 +377,7 @@ The `_consentReady` promise pattern is the one testable behavior: that `waitForC
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the Privacy Settings button be hidden when `privacyOptionsRequirementStatus === NOT_REQUIRED`?**
    - What we know: UMP SDK sets this status for non-EEA users; calling `showPrivacyOptionsForm()` when NOT_REQUIRED may be a no-op or error

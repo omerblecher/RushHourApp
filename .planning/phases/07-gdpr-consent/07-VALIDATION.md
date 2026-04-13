@@ -17,18 +17,18 @@ created: 2026-04-13
 
 | Property | Value |
 |----------|-------|
-| **Framework** | jest (via React Native / Capacitor test setup) |
-| **Config file** | jest.config.js (if present) |
-| **Quick run command** | `npx jest --testPathPattern=adService` |
-| **Full suite command** | `npx jest` |
+| **Framework** | Vitest 4.x |
+| **Config file** | vitest.config.ts |
+| **Quick run command** | `npx vitest run adService` |
+| **Full suite command** | `npx vitest run` |
 | **Estimated runtime** | ~30 seconds |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** Run `npx jest --testPathPattern=adService`
-- **After every plan wave:** Run `npx jest`
+- **After every task commit:** Run `npx vitest run adService`
+- **After every plan wave:** Run `npx vitest run`
 - **Before `/gsd-verify-work`:** Full suite must be green
 - **Max feedback latency:** 60 seconds
 
@@ -38,10 +38,10 @@ created: 2026-04-13
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 7-01-01 | 01 | 1 | GDPR-01 | — | consentReady promise resolves before any ad API | unit | `npx jest --testPathPattern=adService` | ❌ W0 | ⬜ pending |
-| 7-01-02 | 01 | 1 | GDPR-02 | — | showConsentForm called only when REQUIRED | unit | `npx jest --testPathPattern=adService` | ❌ W0 | ⬜ pending |
-| 7-01-03 | 01 | 2 | GDPR-03 | — | non-EEA path skips dialog | unit | `npx jest --testPathPattern=adService` | ❌ W0 | ⬜ pending |
-| 7-01-04 | 01 | 2 | GDPR-04 | — | waitForConsent blocks ad load | unit | `npx jest --testPathPattern=adService` | ❌ W0 | ⬜ pending |
+| 7-01-01 | 01 | 1 | GDPR-01 | — | consentReady promise resolves before any ad API | unit | `npx vitest run adService` | ❌ W0 | ⬜ pending |
+| 7-01-02 | 01 | 1 | GDPR-02 | — | showConsentForm called only when REQUIRED | unit | `npx vitest run adService` | ❌ W0 | ⬜ pending |
+| 7-01-03 | 01 | 2 | GDPR-03 | — | non-EEA path skips dialog | unit | `npx vitest run adService` | ❌ W0 | ⬜ pending |
+| 7-01-04 | 01 | 2 | GDPR-04 | — | waitForConsent blocks ad load | unit | `npx vitest run adService` | ❌ W0 | ⬜ pending |
 | 7-01-05 | 01 | 3 | GDPR-05 | — | privacy settings entry point accessible | manual | — | N/A | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
@@ -50,7 +50,7 @@ created: 2026-04-13
 
 ## Wave 0 Requirements
 
-- [ ] `src/__tests__/adService.test.ts` — stubs for GDPR-01 through GDPR-04
+- [ ] `src/services/__tests__/adService.test.ts` — stubs for GDPR-01 through GDPR-04
 - [ ] Mock for `@capacitor-community/admob` UMP APIs
 
 *If none: "Existing infrastructure covers all phase requirements."*
