@@ -28,7 +28,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 - [x] **Phase 7: GDPR Consent** — Implement adService singleton and UMP consent flow; no ad may load before consent resolves (completed 2026-04-13)
 - [x] **Phase 8: Banner Ad** — Display adaptive banner at bottom of GameScreen with lifecycle management and layout padding (completed 2026-04-13)
 - [x] **Phase 9: Interstitial Ad** — Preload and show interstitial every 3rd win with timeout guard and auto-reload (completed 2026-04-13)
-- [ ] **Phase 10: Production & Play Store** — Swap in real ad IDs, update privacy policy and Play Store metadata, bump version, test release AAB
+- [x] **Phase 10: Production & Play Store** — Swap in real ad IDs, update privacy policy and Play Store metadata, bump version, test release AAB (completed 2026-04-15)
 
 ## Phase Details
 
@@ -101,9 +101,9 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   4. `versionCode` is 2 and `versionName` is "1.1" in `android/app/build.gradle`
   5. The release AAB passes all checks on the internal testing track before promotion to production
 **Plans**: 3 plans
-- [ ] 10-01-PLAN.md — Create ADMOB-SETUP.md guide + docs/privacy-policy.html + version bump + adService.ts privacyPolicyUrl (RELEASE-01, RELEASE-02, RELEASE-04)
-- [ ] 10-02-PLAN.md — Human checkpoint: fill real AdMob IDs + publish GitHub Pages + build signed release AAB (RELEASE-02, RELEASE-04)
-- [ ] 10-03-PLAN.md — Human checkpoint: upload AAB to internal testing track + enable Contains ads + update Data Safety (RELEASE-03, RELEASE-05)
+- [x] 10-01-PLAN.md — Create ADMOB-SETUP.md guide + docs/privacy-policy.html + version bump + adService.ts privacyPolicyUrl (RELEASE-01, RELEASE-02, RELEASE-04)
+- [x] 10-02-PLAN.md — Human checkpoint: fill real AdMob IDs + publish GitHub Pages + build signed release AAB (RELEASE-02, RELEASE-04)
+- [x] 10-03-PLAN.md — Human checkpoint: upload AAB to internal testing track + enable Contains ads + update Data Safety (RELEASE-03, RELEASE-05)
 
 ## Progress
 
@@ -118,4 +118,4 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 | 7. GDPR Consent | v1.1 | 2/2 | Complete | 2026-04-13 |
 | 8. Banner Ad | v1.1 | 2/2 | Complete | 2026-04-13 |
 | 9. Interstitial Ad | v1.1 | 3/3 | Complete | 2026-04-13 |
-| 10. Production & Play Store | v1.1 | 0/3 | Not started | - |
+| 10. Production & Play Store | v1.1 | 3/3 | Complete    | 2026-04-15 |
