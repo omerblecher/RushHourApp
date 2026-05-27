@@ -12,6 +12,10 @@
             <meta-data
                 android:name="com.google.android.gms.ads.APPLICATION_ID"
                 android:value="@string/admob_app_id"/>
+            <!-- AppLovin SDK key — obtain from https://dash.applovin.com > Account > Keys -->
+            <meta-data
+                android:name="applovin.sdk.key"
+                android:value="@string/applovin_sdk_key"/>
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:screenOrientation="portrait"

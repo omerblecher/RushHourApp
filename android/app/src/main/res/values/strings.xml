@@ -6,4 +6,6 @@
     <string name="custom_url_scheme">com.rushhour.puzzle</string>
     <!-- AdMob test App ID (Phase 6, SETUP-02). Phase 10 replaces with real ID. -->
     <string name="admob_app_id">ca-app-pub-4227443066128564~9255965146</string>
+    <!-- AppLovin SDK key — replace TODO with value from https://dash.applovin.com > Account > Keys -->
+    <string name="applovin_sdk_key">TODO_REPLACE_WITH_APPLOVIN_SDK_KEY</string>
 </resources>

@@ -1,4 +1,4 @@
-import { AdMob, AdmobConsentDebugGeography, AdmobConsentStatus, BannerAdSize, BannerAdPosition, InterstitialAdPluginEvents } from '@capacitor-community/admob';
+import { AdMob, AdmobConsentDebugGeography, AdmobConsentStatus, BannerAdSize, BannerAdPosition, InterstitialAdPluginEvents, MaxAdContentRating } from '@capacitor-community/admob';
 import type { AdmobConsentRequestOptions } from '@capacitor-community/admob';
 
 // Safe default: resolved promise so waitForConsent() never throws if called before initAdService()
@@ -33,7 +33,11 @@ async function runConsentFlow(): Promise<void> {
 }
 
 export function initAdService(): void {
-  _consentReady = AdMob.initialize().then(() => runConsentFlow());
+  _consentReady = AdMob.initialize({
+    tagForChildDirectedTreatment: true,
+    tagForUnderAgeOfConsent: true,
+    maxAdContentRating: MaxAdContentRating.General,
+  }).then(() => runConsentFlow());
 }
 
 export function waitForConsent(): Promise<void> {
